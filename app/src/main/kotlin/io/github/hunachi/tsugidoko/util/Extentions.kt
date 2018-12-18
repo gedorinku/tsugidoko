@@ -1,4 +1,4 @@
-package io.github.hunachi.tsugidoko
+package io.github.hunachi.tsugidoko.util
 
 import android.content.Context
 import android.content.Intent

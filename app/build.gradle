@@ -17,8 +17,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         def properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        def MAP_KEY = properties.getProperty("MAP_KEY")
-        resValue "string", "map_key", "\"${MAP_KEY}\""
+        resValue "string", "map_key", "\"${properties.getProperty("MAP_KEY")}\""
     }
     buildTypes {
         release {
@@ -30,9 +29,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
         androidTest.java.srcDirs += 'src/androidTest/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
-    }
-    dataBinding {
-        enabled = true
     }
 }
 
