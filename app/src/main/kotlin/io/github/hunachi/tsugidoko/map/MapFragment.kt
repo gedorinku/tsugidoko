@@ -14,10 +14,12 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.hunachi.tsugidoko.R
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    private val mapViewModel: MapViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +45,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
+        // TODO ここにmarkerの処をかく（別にmethodを新しく作るのはおk．）
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))

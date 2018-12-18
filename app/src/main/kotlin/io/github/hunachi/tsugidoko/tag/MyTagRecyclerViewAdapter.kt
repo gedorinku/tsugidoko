@@ -1,15 +1,13 @@
 package io.github.hunachi.tsugidoko.tag
 
 import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import io.github.hunachi.tsugidoko.R
+import io.github.hunachi.tsugidoko.model.Tag
 import io.github.hunachi.tsugidoko.util.inflate
-import kotlinx.android.synthetic.main.fragment_tag.view.*
 
 /**
  * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
