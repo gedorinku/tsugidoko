@@ -46,6 +46,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mMap = googleMap
 
         // TODO ここにmarkerの処をかく（別にmethodを新しく作るのはおk．）
+        /*for(classRoom in mapViewModel.fetchClassRooms()){
+            //val classRoomPosition = LatLng(classRoom.latitude,classRoom.longitude)
+            //mMap.addMarker(MarkerOptions().position(classRoomPosition).title("<Tag> in <classRoomName>"))
+        }*/
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
