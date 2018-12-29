@@ -6,5 +6,6 @@ data class ClassRoom(
         val beacons: List<Beacon>,
         val latitude: Double,
         val longitude: Double,
-        val buildingId: Int
+        val buildingId: Int,
+        val floor: Int
 )
