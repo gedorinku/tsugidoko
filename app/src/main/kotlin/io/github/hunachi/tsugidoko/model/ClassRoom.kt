@@ -7,5 +7,6 @@ data class ClassRoom(
         val latitude: Double,
         val longitude: Double,
         val buildingId: Int,
-        val floor: Int
+        val floor: Int,
+        val tagCounts: List<TagCount>
 )
