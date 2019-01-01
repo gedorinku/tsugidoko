@@ -19,7 +19,8 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".tag.SelectTagActivity"></activity>
+        <activity android:name=".tag.SelectTagActivity" />
+
         <activity android:name=".login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,7 +35,8 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
+
     </application>
 
 </manifest>

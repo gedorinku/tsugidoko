@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import io.github.hunachi.tsugidoko.detailMap.DetailMapFragment
-import io.github.hunachi.tsugidoko.model.dammyDetailMap
+import io.github.hunachi.tsugidoko.model.dummyDetailMap
 import io.github.hunachi.tsugidoko.util.inTransaction
 import io.github.hunachi.tsugidoko.util.toast
 
@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         supportFragmentManager.inTransaction {
-            add(R.id.container, DetailMapFragment.newInstance(dammyDetailMap))
+            add(R.id.container, DetailMapFragment.newInstance(dummyDetailMap))
         }
     }
 

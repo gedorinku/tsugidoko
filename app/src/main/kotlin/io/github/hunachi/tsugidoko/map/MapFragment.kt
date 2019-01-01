@@ -7,14 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.hunachi.tsugidoko.R
+import io.github.hunachi.tsugidoko.model.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -26,15 +27,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         childFragmentManager
-            .beginTransaction()
-            .add(R.id.container, SupportMapFragment().apply {
-                getMapAsync(this@MapFragment)
-            })
-            .commit()
+                .beginTransaction()
+                .add(R.id.container, SupportMapFragment().apply {
+                    getMapAsync(this@MapFragment)
+                })
+                .commit()
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
@@ -45,13 +46,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         // TODO ここにmarkerの処をかく（別にmethodを新しく作るのはおk．）
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        for (classRoom in dummyClassRooms) {
+            if (!isExistGroup(dummyUser, classRoom)) continue
+            val classRoomPosition = LatLng(classRoom.latitude, classRoom.longitude)
+            mMap.addMarker(MarkerOptions().position(classRoomPosition).title("Marker in classRoom" + classRoom.id))
+        }
+    }
+
+    private fun isExistGroup(user: User, classRoom: ClassRoom): Boolean {
+        for (targetTag in user.tags) {
+            for (tagCount in classRoom.tagCounts) {
+                if (targetTag != tagCount.tag) continue
+                if (tagCount.Count >= 5) return true
+            }
+        }
+        return false
     }
 
     companion object {
         fun newInstance() =
-            MapFragment().apply { arguments = bundleOf() }
+                MapFragment().apply { arguments = bundleOf() }
     }
 }

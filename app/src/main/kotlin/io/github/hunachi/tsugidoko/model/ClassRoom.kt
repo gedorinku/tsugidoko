@@ -8,6 +8,8 @@ data class ClassRoom(
         val beacons: List<Beacon>,
         val latitude: Double,
         val longitude: Double,
-        val buildingId: Int, /*= DetailMapId*/
+        val buildingId: Int,
+        val floor: Int,
+        val tagCounts: List<TagCount>,
         val detailPosition: Point
 )
