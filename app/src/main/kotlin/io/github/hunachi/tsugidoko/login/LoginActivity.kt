@@ -13,18 +13,19 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginActivity : AppCompatActivity() {
 
-    private var isLogin = true
+    private var isRegister = false
     private val loginViewModel: LoginViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
         with(submitButton) {
             setOnClickListener {
                 val userName = identicalText.text.toString()
                 val password = passwordText.text.toString()
                 if (userName.isNotBlank() && password.isNotBlank()) {
-                    loginViewModel.submit(userName, password)
+                    loginViewModel.submit(userName, password, isRegister)
                 }
             }
             text = "ログイン"
@@ -32,28 +33,17 @@ class LoginActivity : AppCompatActivity() {
         with(changeLoginStateText) {
             text = "新規登録をしていない方はこちら！"
             setOnClickListener {
-                isLogin = !isLogin
-                submitButton.text = if (isLogin) "ログイン" else "登録"
-                text = if (isLogin) "新規登録をしていない方はこちら！" else "登録済みの方はこちら！"
-                identicalText.hint = if (isLogin) "login ID" else "mail address"
+                isRegister = !isRegister
+                submitButton.text = if (isRegister) "登録" else "ログイン"
+                text = if (isRegister) "登録済みの方はこちら！" else "新規登録をしていない方はこちら！"
+                identicalText
             }
         }
         loginViewModel.submitStatus.nonNullObserve(this) {
             when (it) {
-                is NetworkState.Success -> {
-                    toast(it.result.name)
-                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                }
+                is NetworkState.Success -> finish()
                 is NetworkState.Error -> toast(it.e.message ?: "hogehoge")
             }
         }
-    }
-
-    private fun successSubmit() {
-
-    }
-
-    private fun errorSubmit() {
-
     }
 }
