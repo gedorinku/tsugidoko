@@ -11,7 +11,6 @@ abstract class ServiceClient {
     protected val channel: ManagedChannel = ManagedChannelBuilder
             .forAddress(BuildConfig.SERVER_URL, BuildConfig.PORT.toInt())
             .useTransportSecurity()
-          //  .usePlaintext()
             .build()
 
     protected val header = Metadata()

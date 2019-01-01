@@ -8,9 +8,9 @@ import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 
 val appModule = module {
-    factory { SessionServiceClient() }
+    factory { SessionServiceClient(get()) }
 
-    factory { UserServiceClient(get()) }
+    factory { UserServiceClient() }
 
     viewModel { MapViewModel() }
 

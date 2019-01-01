@@ -35,13 +35,13 @@ class LoginActivity : AppCompatActivity() {
                 isLogin = !isLogin
                 submitButton.text = if (isLogin) "ログイン" else "登録"
                 text = if (isLogin) "新規登録をしていない方はこちら！" else "登録済みの方はこちら！"
-                identicalText.hint = if (isLogin) "login ID" else "mail address"
+                identicalText
             }
         }
         loginViewModel.submitStatus.nonNullObserve(this) {
             when (it) {
                 is NetworkState.Success -> {
-                    toast(it.result.name)
+                    toast(it.result)
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                 }
                 is NetworkState.Error -> toast(it.e.message ?: "hogehoge")

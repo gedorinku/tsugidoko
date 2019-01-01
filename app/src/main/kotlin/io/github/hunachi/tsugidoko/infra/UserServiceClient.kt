@@ -4,10 +4,9 @@ import gedorinku.tsugidoko_server.UserServiceGrpc
 import gedorinku.tsugidoko_server.Users
 import io.grpc.Metadata
 import io.grpc.stub.MetadataUtils
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
-class UserServiceClient(private val sessionClient: SessionServiceClient) : ServiceClient() {
+class UserServiceClient : ServiceClient() {
 
     private val userStub = UserServiceGrpc.newBlockingStub(channel)
 
@@ -23,13 +22,6 @@ class UserServiceClient(private val sessionClient: SessionServiceClient) : Servi
 
 
     suspend fun createUser(userName: String, password: String) = coroutineScope {
-
-        val session = async {
-            sessionClient.createSession(userName, password)
-        }
-
-        setKey(session.await().sessionId)
-
 
         val createRequest = Users.CreateUserRequest.newBuilder()
                 .setName(userName)
