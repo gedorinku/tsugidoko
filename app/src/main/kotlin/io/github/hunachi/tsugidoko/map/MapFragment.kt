@@ -45,7 +45,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        // TODO ここにmarkerの処をかく（別にmethodを新しく作るのはおk．）
         for (classRoom in dummyClassRooms) {
             if (!isExistGroup(dummyUser, classRoom)) continue
             val classRoomPosition = LatLng(classRoom.latitude, classRoom.longitude)
