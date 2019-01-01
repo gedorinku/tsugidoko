@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package gedorinku.tsugidoko_server;
+
+option go_package = "github.com/gedorinku/tsugidoko-server/api;api_pb";
+
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+import "type/tag.proto";
+
+service UserService {
+  rpc GetCurrentUser (GetCurrentUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/user"
+    };
+  }
+  rpc UpdateUser (UpdateUserRequest) returns (User) {
+    option (google.api.http) = {
+      patch: "/user"
+      body: "user"
+    };
+  }
+  rpc GetUser (GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/users/{user_id}"
+    };
+  }
+  rpc CreateUser (CreateUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/users"
+      body: "user"
+    };
+  }
+}
+
+message User {
+  uint32 user_id = 1;
+  string name = 2;
+  repeated type.Tag tags = 3;
+}
+
+message GetCurrentUserRequest {
+}
+
+message UpdateUserRequest {
+  User user = 1;
+}
+
+message GetUserRequest {
+  uint32 user_id = 1;
+}
+
+message CreateUserRequest {
+  User user = 1;
+}
