@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.submitStatus.nonNullObserve(this) {
             when (it) {
                 is NetworkState.Success -> {
-                  //  toast(it.result.name)
+                    toast(it.result.name)
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                 }
                 is NetworkState.Error -> toast(it.e.message ?: "hogehoge")

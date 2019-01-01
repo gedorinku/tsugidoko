@@ -1,12 +1,12 @@
 package io.github.hunachi.tsugidoko.infra
 
-/*import gedorinku.tsugidoko_server.SessionServiceGrpc
+import gedorinku.tsugidoko_server.SessionServiceGrpc
 import gedorinku.tsugidoko_server.Sessions
-import kotlinx.coroutines.coroutineScope*/
+import kotlinx.coroutines.coroutineScope
 
 class SessionServiceClient : ServiceClient() {
 
-    /*private val sessionStub = SessionServiceGrpc.newBlockingStub(channel)
+    private val sessionStub = SessionServiceGrpc.newBlockingStub(channel)
 
 
     suspend fun createSession(userName: String, password: String) = coroutineScope {
@@ -18,5 +18,5 @@ class SessionServiceClient : ServiceClient() {
         sessionStub.createSession(createRequest)
     }
 
-    override fun setKey(sessionId: String) {}*/
+    override fun setKey(sessionId: String) {}
 }

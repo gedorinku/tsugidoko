@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
-//apply plugin: 'com.google.protobuf'
+apply plugin: 'com.google.protobuf'
 
 
 android {
@@ -86,11 +86,10 @@ dependencies {
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
     implementation "javax.annotation:javax.annotation-api:1.2"
-
 }
 
 protobuf {
-    protoc { artifact = 'com.google.protobuf:protoc:3.5.1-1' }
+    protoc { artifact = 'com.google.protobuf:protoc:3.1.0' }
     plugins {
         javalite { artifact = "com.google.protobuf:protoc-gen-javalite:3.0.0" }
         grpc {
@@ -103,7 +102,6 @@ protobuf {
                 javalite {}
                 grpc {
                     option 'lite'
-                    option 'enable_deprecated=false'
                 }
             }
         }
