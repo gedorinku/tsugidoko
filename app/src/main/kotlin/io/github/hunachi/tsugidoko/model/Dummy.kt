@@ -19,13 +19,14 @@ fun dummyFloorRooms(num: Int) = FloorRooms(
 fun dummyClassRoom(num: Int) =
         ClassRoom(num,
                 "classRoom + $num",
-                listOf(Beacon(num, "$num", num)),
+                listOf(/*Beacon(num, "$num", num)*/),
                 -34.0 + Random().nextInt(10) % 10,
                 151.0 + Random().nextInt(10) % 10,
                 num,
                 num,
-                listOf(TagCount(Tag(((num + 2) % 2).toLong(), "dummy${((num + 2) % 2)}"), Random().nextInt(10)),
-                        TagCount(Tag(((num + 1) % 2).toLong(), "dummy${((num + 1) % 2)}"), Random().nextInt(10))),
+                listOf()
+                /*listOf(TagCount(Tag(((num + 2) % 2).toLong(), "dummy${((num + 2) % 2)}"), Random().nextInt(10)),
+                        TagCount(Tag(((num + 1) % 2).toLong(), "dummy${((num + 1) % 2)}"), Random().nextInt(10)))*/,
                 Point(0, 0))
 
 

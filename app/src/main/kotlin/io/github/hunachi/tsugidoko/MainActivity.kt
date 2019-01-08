@@ -16,13 +16,13 @@ import org.koin.android.ext.android.inject
 class MainActivity : AppCompatActivity() {
 
     private val preference: SharedPreferences by inject()
-    private val mapFragment =  MapFragment.newInstance()
+    private val mapFragment = MapFragment.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        if(preference.session()?.isNotBlank() != true){
+        if (preference.session()?.isNotBlank() != true) {
             startActivity(Intent(this, LoginActivity::class.java))
         }
 
