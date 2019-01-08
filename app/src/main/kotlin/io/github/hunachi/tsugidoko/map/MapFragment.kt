@@ -43,7 +43,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     }
                 }
             }
-        }//.submit()
+        }.submit()
     }
 
     override fun onCreateView(
@@ -59,18 +59,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
-    /*override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }*/
-
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        //reloadMarker()
-        for (classRoom in dummyClassRooms) {
+        reloadMarker()
+        /*for (classRoom in dummyClassRooms) {
             //if (!isExistGroup(dummyUser, classRoom)) continue
             val classRoomPosition = LatLng(classRoom.latitude, classRoom.longitude)
             mMap?.addMarker(MarkerOptions().position(classRoomPosition).title("Marker in classRoom" + classRoom.id))
-        }
+        }*/
     }
 
     /*private fun isExistGroup(user: User, classRoom: ClassRoom): Boolean {
@@ -84,7 +80,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 */
     fun reloadMarker() {
-        if(/*user != null && */mMap != null){
+        if(user != null && mMap != null){
             classRooms.groupBy { it.buildingId }.flatMap { it.component2() }.filter {
                 it.tagCounts.filter { tagCount ->
                     user?.tagsList?.map { tag -> tag.id }?.contains(tagCount.tag.id) ?: false

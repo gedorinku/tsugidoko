@@ -7,7 +7,7 @@ import kotlinx.coroutines.coroutineScope
 
 class ClassRoomServiceClient : ServiceClient() {
 
-    private val classRoomStub = ClassRoomServiceGrpc.newBlockingStub(channel)
+    private var classRoomStub = ClassRoomServiceGrpc.newBlockingStub(channel)
 
     suspend fun classRooms(sessionId: String) = coroutineScope {
 
@@ -21,6 +21,6 @@ class ClassRoomServiceClient : ServiceClient() {
 
     override fun setKey(sessionId: String) {
         header.put(io.grpc.Metadata.Key.of("authorization", io.grpc.Metadata.ASCII_STRING_MARSHALLER), "session $sessionId")
-        MetadataUtils.attachHeaders(classRoomStub, header)
+        classRoomStub = MetadataUtils.attachHeaders(classRoomStub, header)
     }
 }

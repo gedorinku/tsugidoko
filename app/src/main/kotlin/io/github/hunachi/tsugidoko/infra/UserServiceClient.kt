@@ -8,7 +8,7 @@ import kotlinx.coroutines.coroutineScope
 
 class UserServiceClient : ServiceClient() {
 
-    private val userStub = UserServiceGrpc.newBlockingStub(channel)
+    private var userStub = UserServiceGrpc.newBlockingStub(channel)
 
 
     suspend fun user(sessionId: String) = coroutineScope {
@@ -33,6 +33,6 @@ class UserServiceClient : ServiceClient() {
 
     override fun setKey(sessionId: String) {
         header.put(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER), "session $sessionId")
-        MetadataUtils.attachHeaders(userStub, header)
+        userStub = MetadataUtils.attachHeaders(userStub, header)
     }
 }
