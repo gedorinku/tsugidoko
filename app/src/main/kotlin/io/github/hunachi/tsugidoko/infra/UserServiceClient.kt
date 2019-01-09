@@ -13,7 +13,7 @@ class UserServiceClient : ServiceClient() {
 
     suspend fun user(sessionId: String) = coroutineScope {
 
-        setKey(sessionId)
+        userStub = MetadataUtils.attachHeaders(userStub, setKeyMetadata(sessionId))
 
         val createRequest = Users.GetCurrentUserRequest.newBuilder()
                 .build()
@@ -29,10 +29,5 @@ class UserServiceClient : ServiceClient() {
                 .build()
 
         userStub.createUser(createRequest)
-    }
-
-    override fun setKey(sessionId: String) {
-        header.put(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER), "session $sessionId")
-        userStub = MetadataUtils.attachHeaders(userStub, header)
     }
 }

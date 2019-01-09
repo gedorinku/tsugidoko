@@ -11,16 +11,11 @@ class ClassRoomServiceClient : ServiceClient() {
 
     suspend fun classRooms(sessionId: String) = coroutineScope {
 
-        setKey(sessionId)
+        classRoomStub = MetadataUtils.attachHeaders(classRoomStub, setKeyMetadata(sessionId))
 
         val createRequest = ClassRooms.ListClassRoomsRequest.newBuilder()
                 .build()
 
         classRoomStub.listClassRooms(createRequest).classRoomsList
-    }
-
-    override fun setKey(sessionId: String) {
-        header.put(io.grpc.Metadata.Key.of("authorization", io.grpc.Metadata.ASCII_STRING_MARSHALLER), "session $sessionId")
-        classRoomStub = MetadataUtils.attachHeaders(classRoomStub, header)
     }
 }

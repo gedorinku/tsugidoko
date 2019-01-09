@@ -33,6 +33,4 @@ class SessionServiceClient(private val userServiceClient: UserServiceClient) : S
                 .build()
         sessionStub.createSession(createRequest)
     }
-
-    override fun setKey(sessionId: String) {}
 }
