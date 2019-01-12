@@ -20,7 +20,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         def properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        resValue "string", "map_key", "\"${properties.getProperty("MAP_KEY")}\""
+        resValue "string", "map_key", "${properties.getProperty("MAP_KEY")}"
         buildConfigField "String", "SERVER_URL", "\"${properties.getProperty("SERVER_URL")}\""
         buildConfigField "String", "PORT", "\"${properties.getProperty("PORT")}\""
     }
