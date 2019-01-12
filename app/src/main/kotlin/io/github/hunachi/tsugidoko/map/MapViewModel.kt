@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import gedorinku.tsugidoko_server.Users
+import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.infra.ClassRoomServiceClient
 import io.github.hunachi.tsugidoko.infra.UserServiceClient
 import io.github.hunachi.tsugidoko.model.ClassRoom
@@ -22,29 +23,43 @@ class MapViewModel(
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
-    private val _submitStatus = MutableLiveData<NetworkState<Pair<List<ClassRoom>, Users.User>>>()
-    val submitStatus: LiveData<NetworkState<Pair<List<ClassRoom>, Users.User>>> = _submitStatus
+    private val _userState = MutableLiveData<NetworkState<Users.User>>()
+    val userState: LiveData<NetworkState<Users.User>> = _userState
 
-    fun submit() {
-        try {
-            scope.launch {
-                try {
-                    preference.session()?.let { it ->
+    private val _classRoomState = MutableLiveData<NetworkState<List<ClassRoom>>>()
+    val classRoomState: LiveData<NetworkState<List<ClassRoom>>> = _classRoomState
 
-                        val classRoom = async { classRoomsClient.classRooms(it) }
-                        val user = async { userClient.user(it) }
+    fun user() {
+        scope.launch {
+            try {
+                preference.session()?.let { it ->
 
-                        (classRoom.await().map { it.convertToClassRoom() } to user.await()).let {
-                            _submitStatus.postValue(NetworkState.Success(it))
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    _submitStatus.postValue(NetworkState.Error(e))
+                    val user = async { userClient.user(it) }
+
+                    _userState.postValue(NetworkState.Success(user.await()))
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _userState.postValue(NetworkState.Error(e))
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        }
+    }
+
+    fun classRoom(tags: List<TagOuterClass.Tag>) {
+        scope.launch {
+            try {
+                preference.session()?.let { it ->
+
+                    val classRoom = async { classRoomsClient.classRooms(it, tags) }
+
+                    classRoom.await().map { it.convertToClassRoom() }.let {
+                        _classRoomState.postValue(NetworkState.Success(it))
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _classRoomState.postValue(NetworkState.Error(e))
+            }
         }
     }
 
