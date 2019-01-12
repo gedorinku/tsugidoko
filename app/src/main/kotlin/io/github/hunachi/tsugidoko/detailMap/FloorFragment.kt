@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import com.squareup.picasso.Picasso
 import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.model.FloorRooms
 import io.github.hunachi.tsugidoko.util.inflate
@@ -28,7 +29,11 @@ class FloorFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? =
             container!!.inflate(R.layout.fragment_floor).apply {
-                text.text = floorRooms.floor.toString()
+                Picasso.get()
+                        .load(floorRooms.imageUrl)
+                        .fit()
+                        .centerInside()
+                        .into(mapImageView)
             }
 
     companion object {
