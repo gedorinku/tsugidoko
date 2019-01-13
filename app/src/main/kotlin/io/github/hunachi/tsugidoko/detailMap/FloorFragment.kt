@@ -1,6 +1,7 @@
 package io.github.hunachi.tsugidoko.detailMap
 
 import android.content.Context
+import android.graphics.Matrix
 import android.os.Bundle
 import android.telecom.Call
 import android.util.Log
@@ -11,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.graphics.translationMatrix
 import androidx.core.os.bundleOf
 import androidx.core.view.*
 import com.squareup.picasso.Callback
@@ -63,13 +65,34 @@ class FloorFragment : Fragment() {
             val width = (size * density).toInt()
             val height = (size * density).toInt()
             layoutParams = FrameLayout.LayoutParams(width, height).apply {
-                setMargins(mapImageView.x.toInt(), mapImageView.y.toInt(), 0, 0)
+                val mat = Array(9) { 0f }.toFloatArray()
+                mapImageView.imageMatrix.getValues(mat)
+
+                val mapTransX = mat[Matrix.MTRANS_X]
+                val mapTransY = mat[Matrix.MTRANS_Y]
+
+                // detail mapの画像内でのマーカーの位置[dp]
+                // ImageViewの中央によっているので、2 * mapTransX、2 * mapTransYをそれぞれ引いておく
+                val x = classRoom.detailPosition.x * (mapImageView.width - 2 * mapTransX)// / density
+                val y= classRoom.detailPosition.y * (mapImageView.height - 2 * mapTransY)// / density
+
+                val transX = mapImageView.marginLeft + mapTransX.toInt() + x.toInt()
+                val transY = mapImageView.marginTop + mapTransY.toInt() + y.toInt()
+                setMargins(transX, transY, 0, 0)
             }
         }
+        Log.d("map", mapImageView.matrix.toString() + "     " + mapImageView.imageMatrix.toString())
         Picasso.get()
                 .load(R.drawable.people)
                 .fit()
-                .into(imageView)
+                .into(imageView, object : Callback {
+                    override fun onSuccess() {
+                        Log.d("icon", imageView.matrix.toString() + "     " + imageView.imageMatrix.toString())
+                    }
+
+                    override fun onError(e: Exception?) {}
+
+                })
         frame.addView(imageView)
     }
 

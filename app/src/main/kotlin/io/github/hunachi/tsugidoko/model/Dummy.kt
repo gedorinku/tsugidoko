@@ -1,6 +1,6 @@
 package io.github.hunachi.tsugidoko.model
 
-import android.graphics.Point
+import android.graphics.PointF
 import java.util.*
 
 val dummyDetailMap = DetailMap(
@@ -27,7 +27,7 @@ fun dummyClassRoom(num: Int) =
                 listOf()
                 /*listOf(TagCount(Tag(((num + 2) % 2).toLong(), "dummy${((num + 2) % 2)}"), Random().nextInt(10)),
                         TagCount(Tag(((num + 1) % 2).toLong(), "dummy${((num + 1) % 2)}"), Random().nextInt(10)))*/,
-                Point(0, 0))
+                PointF(0.42664670658f, 0.07333333333f))
 
 
 val dummyTags = listOf(Tag(0, "dummy0"), Tag(1, "dummy1"), Tag(2, "dummy2"))
