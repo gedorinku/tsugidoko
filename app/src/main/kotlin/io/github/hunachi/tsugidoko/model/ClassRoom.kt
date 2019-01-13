@@ -1,6 +1,6 @@
 package io.github.hunachi.tsugidoko.model
 
-import android.graphics.Point
+import android.graphics.PointF
 import gedorinku.tsugidoko_server.ClassRooms
 import gedorinku.tsugidoko_server.type.BeaconOuterClass
 import gedorinku.tsugidoko_server.type.TagCountOuterClass
@@ -14,7 +14,7 @@ data class ClassRoom(
         val buildingId: Int,
         val floor: Int,
         val tagCounts: List<TagCountOuterClass.TagCount>,
-        val detailPosition: Point
+        val detailPosition: PointF
 )
 
 fun ClassRooms.ClassRoom.convertToClassRoom() = ClassRoom(
@@ -26,5 +26,5 @@ fun ClassRooms.ClassRoom.convertToClassRoom() = ClassRoom(
         buildingId,
         floor,
         tagCountsList,
-        Point()
+        PointF(localX.toFloat(), localY.toFloat())
 )
