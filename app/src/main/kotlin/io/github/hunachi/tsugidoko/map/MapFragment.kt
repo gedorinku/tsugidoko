@@ -1,5 +1,6 @@
 package io.github.hunachi.tsugidoko.map
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -51,23 +52,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     is NetworkState.Success -> it.result.forEach { classRoom ->
                         if (mMap != null) {
                             /*以下のif文を消すと0人の時にも表示される*/
-                            //if (classRoom.tagCounts.isNotEmpty()) {
+                            if (classRoom.tagCounts.isNotEmpty()) {
                                 CameraPosition.Builder(mMap?.cameraPosition).apply {
                                     mMap?.addMarker(MarkerOptions()
                                             .position(LatLng(classRoom.latitude, classRoom.longitude))
                                             .title("${classRoom.name}(${classRoom.tagCounts.size}人以上)"))
                                 }
                             }
-                       // }
+                        }
                     }
-                    is NetworkState.Error -> {
-
-                    }
+                    is NetworkState.Error ->
+                        Toast.makeText(activity, it.e.message, Toast.LENGTH_SHORT).show()
                 }
             }
-            // if(preference.tags == null) user() else preference.tags
-            user()
         }
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        mapViewModel.user()
     }
 
     override fun onCreateView(

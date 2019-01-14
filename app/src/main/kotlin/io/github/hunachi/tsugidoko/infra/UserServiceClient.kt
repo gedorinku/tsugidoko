@@ -17,6 +17,7 @@ class UserServiceClient : ServiceClient() {
 
         val createRequest = Users.GetCurrentUserRequest.newBuilder()
                 .build()
+
         userStub.getCurrentUser(createRequest)
     }
 
