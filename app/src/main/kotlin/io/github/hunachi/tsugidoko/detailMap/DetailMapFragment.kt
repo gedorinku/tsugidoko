@@ -11,13 +11,13 @@ import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.util.inflate
 import kotlinx.android.synthetic.main.fragment_detail_map.view.*
 import androidx.fragment.app.Fragment
-import io.github.hunachi.tsugidoko.model.DetailMap
+import io.github.hunachi.tsugidoko.model.Building
 
 
 class DetailMapFragment : Fragment(), ViewPager.OnPageChangeListener {
 
-    private val detailMap: DetailMap by lazy {
-        arguments?.getSerializable(ARG_BUILDING_ID) as DetailMap
+    private val detailMap: Building by lazy {
+        arguments?.getSerializable(ARG_BUILDING_ID) as Building
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +46,9 @@ class DetailMapFragment : Fragment(), ViewPager.OnPageChangeListener {
 
     companion object {
         val ARG_BUILDING_ID = "building-id"
-        fun newInstance(detailMap: DetailMap) =
+        fun newInstance(building: Building) =
                 DetailMapFragment().apply {
-                    arguments = bundleOf(ARG_BUILDING_ID to detailMap)
+                    arguments = bundleOf(ARG_BUILDING_ID to building)
                 }
     }
 }

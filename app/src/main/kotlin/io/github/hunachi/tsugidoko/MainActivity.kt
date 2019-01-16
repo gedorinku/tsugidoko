@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.fragment.app.Fragment
 import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.login.LoginActivity
 import io.github.hunachi.tsugidoko.map.MapFragment
@@ -49,6 +50,10 @@ class MainActivity : AppCompatActivity() {
         }
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
+    }
+
+    fun changeFragment(fragment: Fragment) {
+        supportFragmentManager.inTransaction { replace(R.id.container, fragment) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

@@ -3,7 +3,8 @@ package io.github.hunachi.tsugidoko.model
 import android.graphics.PointF
 import java.util.*
 
-val dummyDetailMap = DetailMap(
+/*
+val dummyDetailMap = Building(
         0,
         0,
         "sample",
@@ -19,14 +20,18 @@ fun dummyFloorRooms(num: Int) = FloorRooms(
 fun dummyClassRoom(num: Int) =
         ClassRoom(num,
                 "classRoom + $num",
-                listOf(/*Beacon(num, "$num", num)*/),
+                listOf(*/
+/*Beacon(num, "$num", num)*//*
+),
                 -34.0 + Random().nextInt(10) % 10,
                 151.0 + Random().nextInt(10) % 10,
                 num,
                 num,
                 listOf()
-                /*listOf(TagCount(Tag(((num + 2) % 2).toLong(), "dummy${((num + 2) % 2)}"), Random().nextInt(10)),
-                        TagCount(Tag(((num + 1) % 2).toLong(), "dummy${((num + 1) % 2)}"), Random().nextInt(10)))*/,
+                */
+/*listOf(TagCount(Tag(((num + 2) % 2).toLong(), "dummy${((num + 2) % 2)}"), Random().nextInt(10)),
+                        TagCount(Tag(((num + 1) % 2).toLong(), "dummy${((num + 1) % 2)}"), Random().nextInt(10)))*//*
+,
                 PointF(0.42664670658f, 0.07333333333f))
 
 
@@ -35,3 +40,4 @@ val dummyTags = listOf(Tag(0, "dummy0"), Tag(1, "dummy1"), Tag(2, "dummy2"))
 val dummyUser = User(0, "dummy", dummyTags)
 
 val dummyClassRooms = listOf(dummyClassRoom(0), dummyClassRoom(1), dummyClassRoom(2))
+*/
