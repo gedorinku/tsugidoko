@@ -13,8 +13,8 @@ import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import gedorinku.tsugidoko_server.ClassRooms
 import io.github.hunachi.tsugidoko.R
-import io.github.hunachi.tsugidoko.model.ClassRoom
 import io.github.hunachi.tsugidoko.model.FloorRooms
 import io.github.hunachi.tsugidoko.util.inflate
 import kotlinx.android.synthetic.main.fragment_floor.view.*
@@ -53,7 +53,7 @@ class FloorFragment : Fragment() {
                         })
             }
 
-    private fun View.createPeopleImageView(mapImageView: ImageView, classRoom: ClassRoom) {
+    private fun View.createPeopleImageView(mapImageView: ImageView, classRoom: ClassRooms.ClassRoom) {
         val imageView = ImageView(context).apply {
             val size = 30f
             val density = context.resources.displayMetrics.density
@@ -68,8 +68,8 @@ class FloorFragment : Fragment() {
 
                 // detail mapの画像内でのマーカーの位置[dp]
                 // ImageViewの中央によっているので、2 * mapTransX、2 * mapTransYをそれぞれ引いておく
-                val x = classRoom.detailPosition.x * (mapImageView.width - 2 * mapTransX)
-                val y = classRoom.detailPosition.y * (mapImageView.height - 2 * mapTransY)
+                val x = classRoom.localX * (mapImageView.width - 2 * mapTransX)
+                val y = classRoom.localY * (mapImageView.height - 2 * mapTransY)
 
                 val transX = mapImageView.marginLeft + mapTransX.toInt() + x.toInt()
                 val transY = mapImageView.marginTop + mapTransY.toInt() + y.toInt()
