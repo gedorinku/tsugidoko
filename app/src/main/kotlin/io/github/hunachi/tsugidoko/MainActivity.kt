@@ -1,7 +1,9 @@
 package io.github.hunachi.tsugidoko
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.wifi.SupplicantState
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -10,14 +12,15 @@ import androidx.fragment.app.Fragment
 import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.login.LoginActivity
 import io.github.hunachi.tsugidoko.map.MapFragment
-import io.github.hunachi.tsugidoko.util.inTransaction
-import io.github.hunachi.tsugidoko.util.session
-import io.github.hunachi.tsugidoko.util.toast
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import android.net.wifi.WifiManager
+import io.github.hunachi.tsugidoko.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private val preference: SharedPreferences by inject()
+    private val mainViewModel: MainViewModel by viewModel()
     private val mapFragment = MapFragment.newInstance()
     val selectedTags: MutableList<TagOuterClass.Tag> = mutableListOf()
     private var mMenu: Menu? = null
@@ -33,6 +36,28 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.inTransaction {
             add(R.id.container, mapFragment)
         }
+
+        mainViewModel.apply {
+            sendState.nonNullObserve(this@MainActivity) {
+                mapFragment.reloadMarker()
+                (applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager)
+                        .connectionInfo
+                        .let { info ->
+                            when (info.supplicantState) {
+                                SupplicantState.ASSOCIATED -> sendState(info.bssid, true)
+                                else -> sendState("TODO", false) //TODO
+                            }
+                        }
+            }
+
+            sentState.nonNullObserve(this@MainActivity) {
+                when (it) {
+                    is NetworkState.Success -> mapFragment.addMarker(it.result)
+                    is NetworkState.Error -> { }
+                }
+                preSendState()
+            }
+        }.preSendState()
     }
 
     fun changeTags(tags: List<TagOuterClass.Tag>) {

@@ -35,6 +35,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var mMap: GoogleMap? = null
     private val mapViewModel: MapViewModel by viewModel()
     private var user: Users.User? = null
+    private lateinit var classRooms: List<ClassRooms.ClassRoom>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +58,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 when (it) {
                     is NetworkState.Success ->
                         it.result.groupBy { result -> result.building }.forEach { result ->
+                            this@MapFragment.classRooms = result.value
                             showMapsMarkers(result.key, result.value)
                         }
                     is NetworkState.Error ->
@@ -79,25 +81,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 in 20..50 -> "20人以上"
                 else -> "50人以上"
             }
-            CameraPosition.Builder(mMap?.cameraPosition).apply {
-                mMap?.addMarker(MarkerOptions()
-                        .position(LatLng(building.latitude, building.longitude))
-                        .title("${building.name}(${peopleCountMessage}人以上)"))
-                        ?.apply { tag = Pair(building, classRooms) }
 
-                mMap?.setOnMarkerClickListener { it ->
+            mMap?.addMarker(MarkerOptions()
+                    .position(LatLng(building.latitude, building.longitude))
+                    .title("${building.name}(${peopleCountMessage}人以上)"))
+                    ?.apply { tag = Pair(building, classRooms) }
 
-                    if (checkCouldCast(it)) {
-                        Building(
-                                building.id,
-                                building.name,
-                                classRooms.convertFloors()
-                        ).let {
-                            (activity as MainActivity).changeFragment(DetailMapFragment.newInstance(it))
-                        }
+            mMap?.setOnMarkerClickListener { it ->
+                if (checkCouldCast(it)) {
+                    Building(
+                            building.id,
+                            building.name,
+                            classRooms.convertFloors()
+                    ).let {
+                        (activity as MainActivity).changeFragment(DetailMapFragment.newInstance(it))
                     }
-                    false
                 }
+                false
             }
         }
     }
@@ -150,7 +150,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun reloadMarker() {
+        mMap?.clear()
         mapViewModel.classRoom((activity as MainActivity).selectedTags)
+    }
+
+    fun addMarker(classRoom: ClassRooms.ClassRoom) {
+        mMap?.addMarker(MarkerOptions()
+                .position(LatLng(classRoom.building.latitude + 0.0000000000005, classRoom.building.longitude + 0.0000000000005))
+                .title("${classRoom.building.name}(現在地)"))
+                ?.apply { tag = Pair(classRoom.building, classRooms) }
     }
 
     companion object {
