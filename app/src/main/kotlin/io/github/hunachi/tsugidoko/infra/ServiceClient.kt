@@ -1,6 +1,7 @@
 package io.github.hunachi.tsugidoko.infra
 
 
+import androidx.annotation.CheckResult
 import io.github.hunachi.tsugidoko.BuildConfig
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
@@ -13,7 +14,13 @@ abstract class ServiceClient {
             .useTransportSecurity()
             .build()
 
-    protected val header = Metadata()
-
-    protected abstract fun setKey(sessionId: String)
+    @CheckResult
+    protected fun setKeyMetadata(sessionId: String) =
+            Metadata().apply {
+                put(Metadata.Key.of(
+                        "authorization",
+                        Metadata.ASCII_STRING_MARSHALLER),
+                        "session $sessionId"
+                )
+            }
 }

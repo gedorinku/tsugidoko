@@ -1,5 +1,6 @@
 package io.github.hunachi.tsugidoko
 
+import io.github.hunachi.tsugidoko.infra.ClassRoomServiceClient
 import io.github.hunachi.tsugidoko.infra.SessionServiceClient
 import io.github.hunachi.tsugidoko.infra.UserServiceClient
 import io.github.hunachi.tsugidoko.login.LoginViewModel
@@ -16,7 +17,9 @@ val appModule = module {
 
     factory { UserServiceClient() }
 
-    viewModel { MapViewModel() }
+    factory { ClassRoomServiceClient() }
+
+    viewModel { MapViewModel(get(), get(), get()) }
 
     viewModel { LoginViewModel(get(), get()) }
 }

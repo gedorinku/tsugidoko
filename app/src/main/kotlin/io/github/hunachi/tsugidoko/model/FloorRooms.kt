@@ -1,9 +1,10 @@
 package io.github.hunachi.tsugidoko.model
 
+import gedorinku.tsugidoko_server.ClassRooms
 import java.io.Serializable
 
 data class FloorRooms(
-        val buildingId: Int,
         val floor: Int,
-        val rooms: List<ClassRoom>
+        val imageUrl: String,
+        val rooms: List<ClassRooms.ClassRoom>
 ) : Serializable
