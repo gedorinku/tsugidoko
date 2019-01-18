@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import io.github.hunachi.tsugidoko.R
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -27,7 +28,7 @@ fun ViewGroup.inflate(
 inline fun FragmentManager.inTransaction(
     func: FragmentTransaction.() -> FragmentTransaction
 ) {
-    beginTransaction().func().commit()
+    beginTransaction().setCustomAnimations(R.animator.slide_up, R.animator.slide_down).func().commit()
 }
 
 fun AppCompatActivity.startActivity(next: AppCompatActivity) {
@@ -37,7 +38,7 @@ fun AppCompatActivity.startActivity(next: AppCompatActivity) {
 val <T> T.checkAllMatched: T
     get() = this
 
-fun <T> LiveData<T>.nonNullObserve(owner: LifecycleOwner, observer: (T) -> Unit) {
+fun <T> LiveData<T>.nonNullObserve(owner: LifecycleOwner, observer: (T?) -> Unit) {
     this.observe(owner, Observer { it?.let(observer) })
 }
 

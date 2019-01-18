@@ -1,4 +1,4 @@
-package io.github.hunachi.tsugidoko.tag
+package io.github.hunachi.tsugidoko.login.tag
 
 import androidx.recyclerview.widget.RecyclerView
 import android.view.View
@@ -14,7 +14,7 @@ import io.github.hunachi.tsugidoko.util.inflate
  * specified [OnListFragmentInteractionListener].
  */
 
-class MyTagRecyclerViewAdapter() : ListAdapter<Tag, MyTagRecyclerViewAdapter.ViewHolder>(DIFF_UTIL) {
+class TagRecyclerViewAdapter() : ListAdapter<Tag, TagRecyclerViewAdapter.ViewHolder>(DIFF_UTIL) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(parent.inflate(R.layout.fragment_tag, false))

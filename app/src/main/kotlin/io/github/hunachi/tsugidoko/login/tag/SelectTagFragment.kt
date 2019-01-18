@@ -1,4 +1,4 @@
-package io.github.hunachi.tsugidoko.tag
+package io.github.hunachi.tsugidoko.login.tag
 
 import android.content.Context
 import android.os.Bundle
@@ -11,9 +11,9 @@ import io.github.hunachi.tsugidoko.R
 /**
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the
- * [TagFragment.OnListFragmentInteractionListener] interface.
+ * [SelectTagFragment.OnListFragmentInteractionListener] interface.
  */
-class TagFragment : Fragment() {
+class SelectTagFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +41,6 @@ class TagFragment : Fragment() {
         const val ARG_COLUMN_COUNT = "column-count"
 
         fun newInstance() =
-            TagFragment().apply {}
+            SelectTagFragment().apply {}
     }
 }
