@@ -11,7 +11,7 @@ import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
 import java.lang.Exception
 
-class LoginViewModel(
+class RegisterViewModel(
         private val client: SessionServiceClient,
         private val preference: SharedPreferences
 ) : ViewModel() {
@@ -22,7 +22,7 @@ class LoginViewModel(
     fun submit(userName: String, password: String) {
         viewModelScope.launch {
             try {
-                val session = async { client.createSession(userName, password) }
+                val session = async { client.firstCreateSession(userName, password) }
                 session.await().sessionId.let {
                     preference.session(it)
                     _submitStatus.postValue(NetworkState.Success(it))
@@ -31,7 +31,6 @@ class LoginViewModel(
                 e.printStackTrace()
                 _submitStatus.postValue(NetworkState.Error(e))
             }
-
         }
     }
 }

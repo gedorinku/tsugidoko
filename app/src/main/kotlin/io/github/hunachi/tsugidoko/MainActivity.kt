@@ -29,9 +29,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        if (preference.session()?.isNotBlank() != true) {
+        //if (preference.session()?.isNotBlank() != true) {
             startActivity(Intent(this, LoginActivity::class.java))
-        }
+        //}
 
         supportFragmentManager.inTransaction {
             add(R.id.container, mapFragment)
