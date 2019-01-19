@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         setUpMap()
     }
 
-    fun isWifiConnected() =
+    private fun isWifiConnected() =
             with(getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager) {
                 activeNetworkInfo != null && activeNetworkInfo.isConnected
                         && activeNetworkInfo.type == ConnectivityManager.TYPE_WIFI
@@ -47,25 +47,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainViewModel.apply {
-            sendState.nonNullObserve(this@MainActivity) {
+            sendState.observe(this@MainActivity) {
                 (applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager)
                         .connectionInfo
                         .let { info ->
-                            if(isWifiConnected()){
+                            if (isWifiConnected()) {
                                 sendState(info.bssid, true)
                                 toast(info.bssid)
-                            }
-                            else sendState("TODO", false)
+                            } else sendState("TODO", false)
                         }
-                mapFragment.reloadMarker(selectedTags) // ここでだめ
+                mapFragment.reloadMarker(selectedTags)
+            }
+
+            sendErrorState.nonNullObserve(this@MainActivity) {
+                toast("error ${it.message}")
+                preSendState()
             }
 
             sentState.nonNullObserve(this@MainActivity) {
-                when (it) {
-                    is NetworkState.Success -> mapFragment.addMarker(it.result)
-                    is NetworkState.Error -> {
-                    }
-                }
+                mapFragment.addMarker(it)
+                preSendState()
+            }
+
+            sentErrorState.nonNullObserve(this@MainActivity) {
+                toast("error ${it.message}")
                 preSendState()
             }
         }.preSendState()

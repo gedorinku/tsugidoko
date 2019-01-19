@@ -1,6 +1,8 @@
 package io.github.hunachi.tsugidoko.infra
 
-class TagServiceClient : ServiceClient() {
+import android.content.SharedPreferences
+
+class TagServiceClient(preferences: SharedPreferences) : ServiceClient(preferences) {
 
   /*  private var tagStub = UserServiceGrpc.newBlockingStub(channel)
 

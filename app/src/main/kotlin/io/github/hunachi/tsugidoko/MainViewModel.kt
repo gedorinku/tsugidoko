@@ -1,6 +1,5 @@
 package io.github.hunachi.tsugidoko
 
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,50 +7,54 @@ import androidx.lifecycle.viewModelScope
 import gedorinku.tsugidoko_server.ClassRooms
 import io.github.hunachi.tsugidoko.infra.UserPositionServiceClient
 import io.github.hunachi.tsugidoko.util.NetworkState
-import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
-import java.lang.Exception
 
 class MainViewModel(
-        private val userPositionClient: UserPositionServiceClient,
-        private val preference: SharedPreferences
+        private val userPositionClient: UserPositionServiceClient
 ) : ViewModel() {
 
-    private val _sendState = MutableLiveData<NetworkState<Boolean>>()
-    val sendState: LiveData<NetworkState<Boolean>> = _sendState
+    private val _sendState = MutableLiveData<Nothing>()
+    val sendState: LiveData<Nothing> = _sendState
 
-    private val _sentState = MutableLiveData<NetworkState<ClassRooms.ClassRoom>>()
-    val sentState: LiveData<NetworkState<ClassRooms.ClassRoom>> = _sentState
+    private val _sendErrorState = MutableLiveData<Exception>()
+    val sendErrorState: LiveData<Exception> = _sendErrorState
+
+    private val _sentState = MutableLiveData<ClassRooms.ClassRoom>()
+    val sentState: LiveData<ClassRooms.ClassRoom> = _sentState
+
+    private val _sentErrorState = MutableLiveData<Exception>()
+    val sentErrorState: LiveData<Exception> = _sentErrorState
 
 
     fun preSendState() {
         viewModelScope.launch {
             try {
                 delay(5000)
-                _sendState.postValue(NetworkState.Success(true))
+                _sendState.postValue(null)
             } catch (e: Exception) {
                 e.printStackTrace()
-                _sendState.postValue(NetworkState.Error(e))
+                _sendErrorState.postValue(e)
             }
         }
     }
 
     fun sendState(bssId: String, isStayingNow: Boolean) {
-        /*viewModelScope.launch {
+        viewModelScope.launch {
             try {
-                preference.session()?.let { it ->
-                    val userPosition = async {
-                        userPositionClient.sendUserPosition(it, bssId, isStayingNow)
-                    }
+                val userPosition = async {
+                    userPositionClient.sendUserPosition(bssId, isStayingNow)
+                }
 
-                    userPosition.await().let {
-                        _sentState.postValue(NetworkState.Success(it.classRoom))
+                userPosition.await().let {
+                    when (it) {
+                        is NetworkState.Success -> _sentState.postValue(it.result.classRoom)
+                        is NetworkState.Error -> _sentErrorState.postValue(it.e)
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                _sentState.postValue(NetworkState.Error(e))
+                _sentErrorState.postValue(e)
             }
-        }*/
+        }
     }
 }

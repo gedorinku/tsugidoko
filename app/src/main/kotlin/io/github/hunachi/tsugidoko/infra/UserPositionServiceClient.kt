@@ -1,18 +1,22 @@
 package io.github.hunachi.tsugidoko.infra
 
+import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.UserPositionServiceGrpc
 import gedorinku.tsugidoko_server.UserPositions
 import gedorinku.tsugidoko_server.type.TagOuterClass
+import io.github.hunachi.tsugidoko.util.NetworkState
 import io.grpc.stub.MetadataUtils
 import kotlinx.coroutines.coroutineScope
 
-class UserPositionServiceClient : ServiceClient() {
+class UserPositionServiceClient(preferences: SharedPreferences) : ServiceClient(preferences) {
 
     private var userPositionStub = UserPositionServiceGrpc.newBlockingStub(channel)
 
-    suspend fun userPosition(sessionId: String, tags: List<TagOuterClass.Tag>) = coroutineScope {
+    init {
+        userPositionStub = MetadataUtils.attachHeaders(userPositionStub, setKeyMetadata())
+    }
 
-        userPositionStub = MetadataUtils.attachHeaders(userPositionStub, setKeyMetadata(sessionId))
+    suspend fun userPosition() = coroutineScope {
 
         val createRequest = UserPositions.GetUserPositionRequest.newBuilder()
                 .build()
@@ -21,15 +25,18 @@ class UserPositionServiceClient : ServiceClient() {
     }
 
 
-    suspend fun sendUserPosition(sessionId: String, bssId: String, isStayingNow: Boolean)= coroutineScope {
+    suspend fun sendUserPosition(bssId: String, isStayingNow: Boolean): NetworkState<UserPositions.UserPosition> = coroutineScope {
 
-        userPositionStub = MetadataUtils.attachHeaders(userPositionStub, setKeyMetadata(sessionId))
+        try {
+            val createRequest = UserPositions.UpdateUserPositionRequest.newBuilder()
+                    .setBssid(bssId)
+                    .setIsValid(isStayingNow)
+                    .build()
 
-        val createRequest = UserPositions.UpdateUserPositionRequest.newBuilder()
-                .setBssid(bssId)
-                .setIsValid(isStayingNow)
-                .build()
+            NetworkState.Success(userPositionStub.updateUserPosition(createRequest))
+        } catch (e: Exception) {
+            NetworkState.Error<UserPositions.UserPosition>(e)
+        }
 
-        userPositionStub.updateUserPosition(createRequest)
     }
 }
