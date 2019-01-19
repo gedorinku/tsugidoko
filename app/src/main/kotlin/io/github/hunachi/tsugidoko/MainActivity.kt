@@ -75,8 +75,8 @@ class MainActivity : AppCompatActivity() {
                 menu.add(0, tag.id, index, tag.name).apply { isCheckable = true }
             }
         }
-        if (menu.findItem(-1) == null) {
-            menu.add(0, -1, selectedTags.size, "参加するタグを増やす．")
+        if (menu.findItem(MENU_ITEM_ADD_TAGS_ID) == null) {
+            menu.add(0, MENU_ITEM_ADD_TAGS_ID, selectedTags.size, "参加するタグを増やす．")
         }
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -100,6 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val MENU_ITEM_ADD_TAGS_ID = -1
 
         fun start(context: Context) =
                 context.startActivity(Intent(context, MainActivity::class.java))
