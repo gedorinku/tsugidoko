@@ -9,7 +9,7 @@ import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.login.tag.SelectTagFragment
 import io.github.hunachi.tsugidoko.util.NetworkState
 import io.github.hunachi.tsugidoko.util.nonNullObserve
-import kotlinx.android.synthetic.main.fragment_register.*
+import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 

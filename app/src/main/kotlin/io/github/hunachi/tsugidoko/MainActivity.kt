@@ -29,9 +29,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        //if (preference.session()?.isNotBlank() != true) {
-            startActivity(Intent(this, LoginActivity::class.java))
-        //}
+        if (preference.session()?.isNotBlank() != true) LoginActivity.start(this)
+
 
         supportFragmentManager.inTransaction {
             add(R.id.container, mapFragment)
@@ -53,7 +52,8 @@ class MainActivity : AppCompatActivity() {
             sentState.nonNullObserve(this@MainActivity) {
                 when (it) {
                     is NetworkState.Success -> mapFragment.addMarker(it.result)
-                    is NetworkState.Error -> { }
+                    is NetworkState.Error -> {
+                    }
                 }
                 preSendState()
             }
@@ -69,9 +69,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        mMenu = menu
+        if (mMenu == null) mMenu = menu
         selectedTags.forEachIndexed { index, tag ->
-            menu.add(0, tag.id, index, tag.name).apply { isCheckable = true }
+            if (menu.findItem(tag.id) == null) {
+                menu.add(0, tag.id, index, tag.name).apply { isCheckable = true }
+            }
+        }
+        if (menu.findItem(-1) == null) {
+            menu.add(0, -1, selectedTags.size, "参加するタグを増やす．")
         }
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -83,8 +88,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         toast(item?.title.toString())
+
+        if (item?.itemId == -1) {
+            LoginActivity.start(this, true)
+            return super.onOptionsItemSelected(item)
+        }
+
         item?.isChecked = !(item?.isChecked ?: true)
         mapFragment.reloadMarker()
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+
+        fun start(context: Context) =
+                context.startActivity(Intent(context, MainActivity::class.java))
     }
 }

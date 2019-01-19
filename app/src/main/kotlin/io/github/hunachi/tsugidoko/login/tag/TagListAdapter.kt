@@ -8,13 +8,10 @@ import androidx.recyclerview.widget.ListAdapter
 import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.model.Tag
 import io.github.hunachi.tsugidoko.util.inflate
+import kotlinx.android.synthetic.main.fragment_tag.view.*
 
-/**
- * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
- * specified [OnListFragmentInteractionListener].
- */
 
-class TagRecyclerViewAdapter() : ListAdapter<Tag, TagRecyclerViewAdapter.ViewHolder>(DIFF_UTIL) {
+class TagListAdapter : ListAdapter<Tag, TagListAdapter.ViewHolder>(DIFF_UTIL) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(parent.inflate(R.layout.fragment_tag, false))
@@ -22,7 +19,11 @@ class TagRecyclerViewAdapter() : ListAdapter<Tag, TagRecyclerViewAdapter.ViewHol
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         holder.itemView.apply {
-
+            checkBox.isChecked = item.isSelected
+            setOnClickListener {
+                item.isSelected = item.isSelected.not()
+                checkBox.isChecked = item.isSelected
+            }
         }
     }
 
