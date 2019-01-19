@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import gedorinku.tsugidoko_server.ClassRooms
 import gedorinku.tsugidoko_server.Users
 import gedorinku.tsugidoko_server.type.BuildingOuterClass
+import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.MainActivity
 import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.detailMap.DetailMapFragment
@@ -46,7 +47,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     is NetworkState.Success -> {
                         user = it.result
                         (activity as MainActivity).changeTags(it.result.tagsList)
-                        reloadMarker()
+                        reloadMarker(it.result.tagsList)
                     }
                     is NetworkState.Error -> {
                         Toast.makeText(activity, "user", Toast.LENGTH_SHORT).show()
@@ -149,9 +150,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun reloadMarker() {
+    fun reloadMarker(tags: List<TagOuterClass.Tag>) {
         mMap?.clear()
-        mapViewModel.classRoom((activity as MainActivity).selectedTags)
+        if (activity == null) {
+            Log.d("hoge", "nullnullhogehoge")
+        } else mapViewModel.classRoom(tags)
     }
 
     fun addMarker(classRoom: ClassRooms.ClassRoom) {

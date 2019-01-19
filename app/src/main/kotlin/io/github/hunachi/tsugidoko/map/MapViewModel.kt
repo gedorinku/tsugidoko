@@ -13,7 +13,6 @@ import io.github.hunachi.tsugidoko.infra.UserServiceClient
 import io.github.hunachi.tsugidoko.util.NetworkState
 import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
-import java.lang.Exception
 
 class MapViewModel(
         private val classRoomsClient: ClassRoomServiceClient,
@@ -36,7 +35,7 @@ class MapViewModel(
 
                     _userState.postValue(NetworkState.Success(user.await()))
                 }
-            } catch (e: Exception) {
+            } catch (e: java.lang.Exception) {
                 e.printStackTrace()
                 _userState.postValue(NetworkState.Error(e))
             }
@@ -52,7 +51,7 @@ class MapViewModel(
 
                     _classRoomState.postValue(NetworkState.Success(classRoom.await()))
                 }
-            } catch (e: Exception) {
+            } catch (e: java.lang.Exception) {
                 e.printStackTrace()
                 _classRoomState.postValue(NetworkState.Error(e))
             }

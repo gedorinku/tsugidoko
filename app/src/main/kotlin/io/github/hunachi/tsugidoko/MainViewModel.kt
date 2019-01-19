@@ -27,7 +27,7 @@ class MainViewModel(
     fun preSendState() {
         viewModelScope.launch {
             try {
-                delay(30000)
+                delay(5000)
                 _sendState.postValue(NetworkState.Success(true))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -37,7 +37,7 @@ class MainViewModel(
     }
 
     fun sendState(bssId: String, isStayingNow: Boolean) {
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             try {
                 preference.session()?.let { it ->
                     val userPosition = async {
@@ -52,6 +52,6 @@ class MainViewModel(
                 e.printStackTrace()
                 _sentState.postValue(NetworkState.Error(e))
             }
-        }
+        }*/
     }
 }

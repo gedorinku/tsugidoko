@@ -3,7 +3,6 @@ package io.github.hunachi.tsugidoko
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.wifi.SupplicantState
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -16,13 +15,15 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import android.net.wifi.WifiManager
 import io.github.hunachi.tsugidoko.util.*
+import android.net.ConnectivityManager
+
 
 class MainActivity : AppCompatActivity() {
 
     private val preference: SharedPreferences by inject()
     private val mainViewModel: MainViewModel by viewModel()
     private val mapFragment = MapFragment.newInstance()
-    val selectedTags: MutableList<TagOuterClass.Tag> = mutableListOf()
+    private val selectedTags: MutableList<TagOuterClass.Tag> = mutableListOf()
     private var mMenu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,22 +32,32 @@ class MainActivity : AppCompatActivity() {
 
         if (preference.session()?.isNotBlank() != true) LoginActivity.start(this)
 
+        setUpMap()
+    }
 
+    fun isWifiConnected() =
+            with(getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager) {
+                activeNetworkInfo != null && activeNetworkInfo.isConnected
+                        && activeNetworkInfo.type == ConnectivityManager.TYPE_WIFI
+            }
+
+    private fun setUpMap() {
         supportFragmentManager.inTransaction {
             add(R.id.container, mapFragment)
         }
 
         mainViewModel.apply {
             sendState.nonNullObserve(this@MainActivity) {
-                mapFragment.reloadMarker()
                 (applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager)
                         .connectionInfo
                         .let { info ->
-                            when (info.supplicantState) {
-                                SupplicantState.ASSOCIATED -> sendState(info.bssid, true)
-                                else -> sendState("TODO", false) //TODO
+                            if(isWifiConnected()){
+                                sendState(info.bssid, true)
+                                toast(info.bssid)
                             }
+                            else sendState("TODO", false)
                         }
+                mapFragment.reloadMarker(selectedTags) // ここでだめ
             }
 
             sentState.nonNullObserve(this@MainActivity) {
@@ -95,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         item?.isChecked = !(item?.isChecked ?: true)
-        mapFragment.reloadMarker()
+        mapFragment.reloadMarker(selectedTags)
         return super.onOptionsItemSelected(item)
     }
 
