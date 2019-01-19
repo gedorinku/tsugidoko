@@ -16,22 +16,31 @@ class LoginViewModel(
         private val preference: SharedPreferences
 ) : ViewModel() {
 
-    private val _submitStatus = MutableLiveData<NetworkState<String>>()
-    val submitStatus: LiveData<NetworkState<String>> = _submitStatus
+    private val _sessionIdState = MutableLiveData<String>()
+    val sessionIdState: LiveData<String> = _sessionIdState
+
+    private val _sessionIdErrorState = MutableLiveData<Exception>()
+    val sessionIdErrorState: LiveData<Exception> = _sessionIdErrorState
 
     fun submit(userName: String, password: String) {
         viewModelScope.launch {
             try {
                 val session = async { client.createSession(userName, password) }
-                session.await().sessionId.let {
-                    preference.session(it)
-                    _submitStatus.postValue(NetworkState.Success(it))
+                session.await().let {
+                    when (it) {
+                        is NetworkState.Success -> {
+                            it.result.sessionId.let { sessionId ->
+                                preference.session(sessionId)
+                                _sessionIdState.postValue(sessionId)
+                            }
+                        }
+                        is NetworkState.Error -> _sessionIdErrorState.postValue(it.e)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                _submitStatus.postValue(NetworkState.Error(e))
+                _sessionIdErrorState.postValue(e)
             }
-
         }
     }
 }

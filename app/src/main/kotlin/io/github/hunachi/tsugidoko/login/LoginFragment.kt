@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.login.tag.SelectTagFragment
-import io.github.hunachi.tsugidoko.util.NetworkState
 import io.github.hunachi.tsugidoko.util.nonNullObserve
+import io.github.hunachi.tsugidoko.util.toast
 import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -38,13 +38,13 @@ class LoginFragment : Fragment() {
         changeLoginStateText.text = "新規登録をしていない方はこちら！"
         identicalText.setText(arguments?.getString(ARG_USERNAME) ?: "")
 
-        loginViewModel.submitStatus.nonNullObserve(this) {
-            when (it) {
-                is NetworkState.Success -> {
-                    changeFragment(SelectTagFragment.newInstance())
-                }
-                is NetworkState.Error -> {
-                }
+        loginViewModel.apply {
+            sessionIdState.nonNullObserve(this@LoginFragment) {
+                changeFragment(SelectTagFragment.newInstance())
+            }
+
+            sessionIdErrorState.nonNullObserve(this@LoginFragment) {
+                activity?.toast("${it.message}")
             }
         }
     }

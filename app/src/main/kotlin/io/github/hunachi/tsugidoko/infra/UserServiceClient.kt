@@ -3,7 +3,7 @@ package io.github.hunachi.tsugidoko.infra
 import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.UserServiceGrpc
 import gedorinku.tsugidoko_server.Users
-import io.grpc.Metadata
+import io.github.hunachi.tsugidoko.util.NetworkState
 import io.grpc.stub.MetadataUtils
 import kotlinx.coroutines.coroutineScope
 
@@ -16,21 +16,27 @@ class UserServiceClient(preferences: SharedPreferences) : ServiceClient(preferen
     }
 
     suspend fun user() = coroutineScope {
+        try {
+            val createRequest = Users.GetCurrentUserRequest.newBuilder()
+                    .build()
 
-        val createRequest = Users.GetCurrentUserRequest.newBuilder()
-                .build()
-
-        userStub.getCurrentUser(createRequest)
+            NetworkState.Success(userStub.getCurrentUser(createRequest))
+        } catch (e: Exception) {
+            NetworkState.Error<Users.User>(e)
+        }
     }
 
 
     suspend fun createUser(userName: String, password: String) = coroutineScope {
+        try {
+            val createRequest = Users.CreateUserRequest.newBuilder()
+                    .setName(userName)
+                    .setPassword(password)
+                    .build()
 
-        val createRequest = Users.CreateUserRequest.newBuilder()
-                .setName(userName)
-                .setPassword(password)
-                .build()
-
-        userStub.createUser(createRequest)
+            NetworkState.Success(userStub.createUser(createRequest))
+        } catch (e: Exception) {
+            NetworkState.Error<Users.User>(e)
+        }
     }
 }

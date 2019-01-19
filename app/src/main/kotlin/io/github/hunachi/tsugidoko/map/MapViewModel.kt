@@ -17,22 +17,32 @@ class MapViewModel(
         private val userClient: UserServiceClient
 ) : ViewModel() {
 
-    private val _userState = MutableLiveData<NetworkState<Users.User>>()
-    val userState: LiveData<NetworkState<Users.User>> = _userState
+    private val _userState = MutableLiveData<Users.User>()
+    val userState: LiveData<Users.User> = _userState
 
-    private val _classRoomState = MutableLiveData<NetworkState<List<ClassRooms.ClassRoom>>>()
-    val classRoomState: LiveData<NetworkState<List<ClassRooms.ClassRoom>>> = _classRoomState
+    private val _userErrorState = MutableLiveData<Exception>()
+    val userErrorState: LiveData<Exception> = _userErrorState
+
+    private val _classRoomState = MutableLiveData<List<ClassRooms.ClassRoom>>()
+    val classRoomState: LiveData<List<ClassRooms.ClassRoom>> = _classRoomState
+
+    private val _classRoomErrorState = MutableLiveData<Exception>()
+    val classRoomErrorState: LiveData<Exception> = _classRoomErrorState
 
     fun user() {
         viewModelScope.launch {
             try {
                 val user = async { userClient.user() }
 
-                _userState.postValue(NetworkState.Success(user.await()))
-
+                user.await().let {
+                    when (it) {
+                        is NetworkState.Success -> _userState.postValue(it.result)
+                        is NetworkState.Error -> _userErrorState.postValue(it.e)
+                    }
+                }
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
-                _userState.postValue(NetworkState.Error(e))
+                _userErrorState.postValue(e)
             }
         }
     }
@@ -42,10 +52,15 @@ class MapViewModel(
             try {
                 val classRoom = async { classRoomsClient.classRooms(tags) }
 
-                _classRoomState.postValue(NetworkState.Success(classRoom.await()))
+                classRoom.await().let {
+                    when (it) {
+                        is NetworkState.Success -> _classRoomState.postValue(it.result)
+                        is NetworkState.Error -> _classRoomErrorState.postValue(it.e)
+                    }
+                }
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
-                _classRoomState.postValue(NetworkState.Error(e))
+                _classRoomErrorState.postValue(e)
             }
         }
     }

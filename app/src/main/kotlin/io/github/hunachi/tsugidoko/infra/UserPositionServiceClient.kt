@@ -3,7 +3,6 @@ package io.github.hunachi.tsugidoko.infra
 import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.UserPositionServiceGrpc
 import gedorinku.tsugidoko_server.UserPositions
-import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.util.NetworkState
 import io.grpc.stub.MetadataUtils
 import kotlinx.coroutines.coroutineScope
@@ -25,7 +24,7 @@ class UserPositionServiceClient(preferences: SharedPreferences) : ServiceClient(
     }
 
 
-    suspend fun sendUserPosition(bssId: String, isStayingNow: Boolean): NetworkState<UserPositions.UserPosition> = coroutineScope {
+    suspend fun sendUserPosition(bssId: String, isStayingNow: Boolean) = coroutineScope {
 
         try {
             val createRequest = UserPositions.UpdateUserPositionRequest.newBuilder()
@@ -37,6 +36,5 @@ class UserPositionServiceClient(preferences: SharedPreferences) : ServiceClient(
         } catch (e: Exception) {
             NetworkState.Error<UserPositions.UserPosition>(e)
         }
-
     }
 }

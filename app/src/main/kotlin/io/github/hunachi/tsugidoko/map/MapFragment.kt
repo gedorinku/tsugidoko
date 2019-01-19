@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -26,8 +25,8 @@ import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.detailMap.DetailMapFragment
 import io.github.hunachi.tsugidoko.model.Building
 import io.github.hunachi.tsugidoko.model.FloorRooms
-import io.github.hunachi.tsugidoko.util.NetworkState
 import io.github.hunachi.tsugidoko.util.nonNullObserve
+import io.github.hunachi.tsugidoko.util.toast
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -43,28 +42,24 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         with(mapViewModel) {
             userState.nonNullObserve(this@MapFragment) {
-                when (it) {
-                    is NetworkState.Success -> {
-                        user = it.result
-                        (activity as MainActivity).changeTags(it.result.tagsList)
-                        reloadMarker(it.result.tagsList)
-                    }
-                    is NetworkState.Error -> {
-                        Toast.makeText(activity, "user", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                user = it
+                (activity as MainActivity).changeTags(it.tagsList)
+                reloadMarker(it.tagsList)
+            }
+
+            userErrorState.nonNullObserve(this@MapFragment) {
+                activity?.toast("${it.message}")
             }
 
             classRoomState.nonNullObserve(this@MapFragment) {
-                when (it) {
-                    is NetworkState.Success ->
-                        it.result.groupBy { result -> result.building }.forEach { result ->
-                            this@MapFragment.classRooms = result.value
-                            showMapsMarkers(result.key, result.value)
-                        }
-                    is NetworkState.Error ->
-                        Toast.makeText(activity, it.e.message, Toast.LENGTH_SHORT).show()
+                it.groupBy { result -> result.building }.forEach { result ->
+                    this@MapFragment.classRooms = result.value
+                    showMapsMarkers(result.key, result.value)
                 }
+            }
+
+            classRoomErrorState.nonNullObserve(this@MapFragment) {
+                activity?.toast("${it.message}")
             }
         }
     }
