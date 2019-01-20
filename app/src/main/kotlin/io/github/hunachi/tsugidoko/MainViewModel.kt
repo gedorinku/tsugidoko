@@ -37,7 +37,7 @@ class MainViewModel(
     fun preSendState() {
         viewModelScope.launch {
             try {
-                delay(5000)
+                delay(20000)
                 _sendState.postValue(null)
             } catch (e: Exception) {
                 e.printStackTrace()

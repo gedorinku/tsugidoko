@@ -58,7 +58,7 @@ class TagServiceClient(preferences: SharedPreferences) : ServiceClient(preferenc
         }
     }
 
-    suspend fun attachTags(tags: List<Tag>) = coroutineScope {
+    suspend fun updateTags(tags: List<Tag>) = coroutineScope {
         try {
             val createRequest =
                     UserTags.UpdateUserTagRequest.newBuilder()

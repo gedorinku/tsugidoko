@@ -22,10 +22,10 @@ class TagListAdapter(val checkedListener: (Tag) -> Unit) : ListAdapter<Tag, TagL
             checkBox.apply {
                 isChecked = item.isSelected
                 text = item.name
-            }
-            setOnClickListener {
-                item.isSelected = item.isSelected.not()
-                checkedListener(item)
+                setOnClickListener {
+                    item.isSelected = item.isSelected.not()
+                    checkedListener(item)
+                }
             }
         }
     }

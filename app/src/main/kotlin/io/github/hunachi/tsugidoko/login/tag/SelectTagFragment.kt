@@ -20,10 +20,8 @@ class SelectTagFragment : Fragment() {
     private val tagListViewModel: TagListViewModel by viewModel()
     private val myTags: MutableList<Tag> = mutableListOf()
     private val checkedListener: (Tag) -> Unit = { tag: Tag ->
-        with(myTags) {
-            add(tag)
-            myTags.distinctBy { it.id }
-        }
+        if(tag.isSelected) myTags.add(tag)
+        else myTags.removeIf { it.id == tag.id }
     }
     private val listAdapter = TagListAdapter(checkedListener)
 
@@ -31,10 +29,10 @@ class SelectTagFragment : Fragment() {
         super.onCreate(savedInstanceState)
         tagListViewModel.apply {
             userState.nonNullObserve(this@SelectTagFragment) {
-                myTags.addAll(
-                        it.tagsList.map { tag -> tag.convertTag(true) }
-                )
-                myTags.distinctBy { tag -> tag.id }
+                myTags.run {
+                    clear()
+                    addAll(it.tagsList.map { tags -> tags.convertTag(true) })
+                }
                 tagList()
             }
 
@@ -43,22 +41,23 @@ class SelectTagFragment : Fragment() {
             }
 
             tagListState.nonNullObserve(this@SelectTagFragment) {
-                listAdapter.submitList(it.toMutableList().apply {
-                    addAll(myTags)
-                    distinctBy { tag -> tag.id }
-                })
+                it.toMutableList().apply {
+                    replaceAll { tag -> myTags.find { myTag -> myTag.id == tag.id } ?: tag }
+                }.let { tags ->
+                    listAdapter.submitList(tags.toList())
+                }
             }
 
             tagListErrorState.nonNullObserve(this@SelectTagFragment) {
                 activity?.toast("${it.message}")
             }
 
-            addTagState.nonNullObserve(this@SelectTagFragment) {
+            updateTagState.nonNullObserve(this@SelectTagFragment) {
                 activity?.toast("success !!")
                 (activity as LoginActivity).finishSetup()
             }
 
-            addTagsErrorState.nonNullObserve(this@SelectTagFragment) {
+            updateTagsErrorState.nonNullObserve(this@SelectTagFragment) {
                 activity?.toast("${it.message}")
             }
         }.user()
@@ -75,7 +74,7 @@ class SelectTagFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
         submit_button.setOnClickListener {
-            (activity as? LoginActivity)?.finishSetup()
+            tagListViewModel.updateTags(myTags)
         }
         create_tag_button.setOnClickListener {
             (activity as? LoginActivity)?.changeFragment(CreateTagFragment.newInstance())

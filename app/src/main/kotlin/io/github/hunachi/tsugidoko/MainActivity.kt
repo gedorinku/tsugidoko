@@ -101,15 +101,23 @@ class MainActivity : AppCompatActivity() {
         mMenu?.let { onCreateOptionsMenu(it) }
     }
 
+    override fun onBackPressed() {
+        if(supportFragmentManager.fragments.find { it is MapFragment } == null) {
+            changeFragment(mapFragment)
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (mMenu == null) mMenu = menu
+        menu.removeGroup(MENU_GROUP_ID)
+
         selectedTags.forEachIndexed { index, tag ->
             if (menu.findItem(tag.id) == null) {
-                menu.add(0, tag.id, index, tag.name).apply { isCheckable = true }
+                menu.add(MENU_GROUP_ID, tag.id, index, tag.name).apply { isCheckable = true }
             }
         }
         if (menu.findItem(MENU_ITEM_ADD_TAGS_ID) == null) {
-            menu.add(0, MENU_ITEM_ADD_TAGS_ID, selectedTags.size, "参加するタグを増やす．")
+            menu.add(MENU_GROUP_ID, MENU_ITEM_ADD_TAGS_ID, selectedTags.size, "タグの設定")
         }
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -134,6 +142,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val MENU_ITEM_ADD_TAGS_ID = -1
+        private const val MENU_GROUP_ID = 0
 
         fun start(context: Context) =
                 context.startActivity(Intent(context, MainActivity::class.java))

@@ -21,14 +21,14 @@ class TagListViewModel(
     private val _tagListState = MutableLiveData<List<Tag>>()
     val tagListState: LiveData<List<Tag>> = _tagListState
 
-    private val _addTagsState =  MutableLiveData<List<Tag>>()
-    val addTagState: LiveData<List<Tag>> = _addTagsState
+    private val _updateTagsState =  MutableLiveData<List<Tag>>()
+    val updateTagState: LiveData<List<Tag>> = _updateTagsState
 
     private val _tagListErrorState = MutableLiveData<Exception>()
     val tagListErrorState: LiveData<Exception> = _tagListErrorState
 
-    private val _addTagsErrorState = MutableLiveData<Exception>()
-    val addTagsErrorState: LiveData<Exception> = _addTagsErrorState
+    private val _updateTagsErrorState = MutableLiveData<Exception>()
+    val updateTagsErrorState: LiveData<Exception> = _updateTagsErrorState
 
     private val _userState = MutableLiveData<Users.User>()
     val userState: LiveData<Users.User> = _userState
@@ -58,24 +58,24 @@ class TagListViewModel(
         }
     }
 
-    fun addTags(tags: List<Tag>) {
+    fun updateTags(tags: List<Tag>) {
         viewModelScope.launch {
             try {
-                val tags = async { tagServiceClient.attachTags(tags) }
+                val result = async { tagServiceClient.updateTags(tags) }
 
-                tags.await().let {
+                result.await().let {
                     when (it) {
                         is NetworkState.Success -> {
-                            _addTagsState.postValue(it.result.tagsList.map { i -> i.convertTag() })
+                            _updateTagsState.postValue(it.result.tagsList.map { i -> i.convertTag() })
                         }
                         is NetworkState.Error -> {
                             it.e.printStackTrace()
-                            _addTagsErrorState.postValue(it.e)
+                            _updateTagsErrorState.postValue(it.e)
                         }
                     }
                 }
             } catch (e: Exception) {
-                _addTagsErrorState.postValue(e)
+                _updateTagsErrorState.postValue(e)
                 e.printStackTrace()
             }
         }
