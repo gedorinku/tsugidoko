@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             sentState.nonNullObserve(this@MainActivity) {
-                mapFragment.addMarker(it)
+                mapFragment.addMyPositionMarker(it)
                 preSendState()
             }
 
