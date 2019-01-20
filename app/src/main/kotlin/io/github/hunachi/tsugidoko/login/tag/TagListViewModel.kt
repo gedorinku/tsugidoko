@@ -1,11 +1,12 @@
 package io.github.hunachi.tsugidoko.login.tag
 
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import gedorinku.tsugidoko_server.Users
 import io.github.hunachi.tsugidoko.infra.TagServiceClient
+import io.github.hunachi.tsugidoko.infra.UserServiceClient
 import io.github.hunachi.tsugidoko.model.Tag
 import io.github.hunachi.tsugidoko.model.convertTag
 import io.github.hunachi.tsugidoko.util.NetworkState
@@ -14,7 +15,7 @@ import java.lang.Exception
 
 class TagListViewModel(
         private val tagServiceClient: TagServiceClient,
-        private val preference: SharedPreferences
+        private val userClient: UserServiceClient
 ) : ViewModel() {
 
     private val _tagListState = MutableLiveData<List<Tag>>()
@@ -28,6 +29,12 @@ class TagListViewModel(
 
     private val _addTagsErrorState = MutableLiveData<Exception>()
     val addTagsErrorState: LiveData<Exception> = _addTagsErrorState
+
+    private val _userState = MutableLiveData<Users.User>()
+    val userState: LiveData<Users.User> = _userState
+
+    private val _userErrorState = MutableLiveData<Exception>()
+    val userErrorState: LiveData<Exception> = _userErrorState
 
     fun tagList() {
         viewModelScope.launch {
@@ -62,6 +69,7 @@ class TagListViewModel(
                             _addTagsState.postValue(it.result.tagsList.map { i -> i.convertTag() })
                         }
                         is NetworkState.Error -> {
+                            it.e.printStackTrace()
                             _addTagsErrorState.postValue(it.e)
                         }
                     }
@@ -69,6 +77,27 @@ class TagListViewModel(
             } catch (e: Exception) {
                 _addTagsErrorState.postValue(e)
                 e.printStackTrace()
+            }
+        }
+    }
+
+    fun user() {
+        viewModelScope.launch {
+            try {
+                val user = async { userClient.user() }
+
+                user.await().let {
+                    when (it) {
+                        is NetworkState.Success -> _userState.postValue(it.result)
+                        is NetworkState.Error -> {
+                            it.e.printStackTrace()
+                            _userErrorState.postValue(it.e)
+                        }
+                    }
+                }
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+                _userErrorState.postValue(e)
             }
         }
     }

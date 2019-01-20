@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.login.LoginActivity
 import io.github.hunachi.tsugidoko.model.Tag
+import io.github.hunachi.tsugidoko.model.convertTag
 import io.github.hunachi.tsugidoko.util.nonNullObserve
 import io.github.hunachi.tsugidoko.util.toast
 import kotlinx.android.synthetic.main.fragment_tag_list.*
@@ -16,30 +17,51 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SelectTagFragment : Fragment() {
 
-    private val listAdapter = TagListAdapter()
     private val tagListViewModel: TagListViewModel by viewModel()
-    private lateinit var tags: List<Tag>
+    private val myTags: MutableList<Tag> = mutableListOf()
+    private val checkedListener: (Tag) -> Unit = { tag: Tag ->
+        with(myTags) {
+            add(tag)
+            myTags.distinctBy { it.id }
+        }
+    }
+    private val listAdapter = TagListAdapter(checkedListener)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tagListViewModel.apply {
-            tagListState.nonNullObserve(this@SelectTagFragment){
-                listAdapter.submitList(it)
+            userState.nonNullObserve(this@SelectTagFragment) {
+                myTags.addAll(
+                        it.tagsList.map { tag -> tag.convertTag(true) }
+                )
+                myTags.distinctBy { tag -> tag.id }
+                tagList()
             }
 
-            tagListErrorState.nonNullObserve(this@SelectTagFragment){
+            userErrorState.nonNullObserve(this@SelectTagFragment) {
                 activity?.toast("${it.message}")
             }
 
-            addTagState.nonNullObserve(this@SelectTagFragment){
+            tagListState.nonNullObserve(this@SelectTagFragment) {
+                listAdapter.submitList(it.toMutableList().apply {
+                    addAll(myTags)
+                    distinctBy { tag -> tag.id }
+                })
+            }
+
+            tagListErrorState.nonNullObserve(this@SelectTagFragment) {
+                activity?.toast("${it.message}")
+            }
+
+            addTagState.nonNullObserve(this@SelectTagFragment) {
                 activity?.toast("success !!")
                 (activity as LoginActivity).finishSetup()
             }
 
-            addTagsErrorState.nonNullObserve(this@SelectTagFragment){
+            addTagsErrorState.nonNullObserve(this@SelectTagFragment) {
                 activity?.toast("${it.message}")
             }
-        }.tagList()
+        }.user()
     }
 
     override fun onCreateView(
@@ -52,8 +74,11 @@ class SelectTagFragment : Fragment() {
             adapter = listAdapter
             layoutManager = LinearLayoutManager(context)
         }
-        button.setOnClickListener {
-            (activity as LoginActivity).finishSetup()
+        submit_button.setOnClickListener {
+            (activity as? LoginActivity)?.finishSetup()
+        }
+        create_tag_button.setOnClickListener {
+            (activity as? LoginActivity)?.changeFragment(CreateTagFragment.newInstance())
         }
     }
 

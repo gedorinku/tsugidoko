@@ -11,7 +11,7 @@ import io.github.hunachi.tsugidoko.util.inflate
 import kotlinx.android.synthetic.main.fragment_tag.view.*
 
 
-class TagListAdapter : ListAdapter<Tag, TagListAdapter.ViewHolder>(DIFF_UTIL) {
+class TagListAdapter(val checkedListener: (Tag) -> Unit) : ListAdapter<Tag, TagListAdapter.ViewHolder>(DIFF_UTIL) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(parent.inflate(R.layout.fragment_tag, false))
@@ -25,7 +25,7 @@ class TagListAdapter : ListAdapter<Tag, TagListAdapter.ViewHolder>(DIFF_UTIL) {
             }
             setOnClickListener {
                 item.isSelected = item.isSelected.not()
-                //checkBox.isChecked = item.isSelected
+                checkedListener(item)
             }
         }
     }

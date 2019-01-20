@@ -3,6 +3,7 @@ package io.github.hunachi.tsugidoko
 import io.github.hunachi.tsugidoko.infra.*
 import io.github.hunachi.tsugidoko.login.LoginViewModel
 import io.github.hunachi.tsugidoko.login.RegisterViewModel
+import io.github.hunachi.tsugidoko.login.tag.CreateTagViewModel
 import io.github.hunachi.tsugidoko.login.tag.TagListViewModel
 import io.github.hunachi.tsugidoko.map.MapViewModel
 import io.github.hunachi.tsugidoko.util.setupSharedPreference
@@ -32,4 +33,6 @@ val appModule = module {
     viewModel { RegisterViewModel(get(), get()) }
 
     viewModel { TagListViewModel(get(), get()) }
+
+    viewModel { CreateTagViewModel(get()) }
 }
