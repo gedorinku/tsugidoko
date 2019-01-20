@@ -1,18 +1,17 @@
 package io.github.hunachi.tsugidoko.infra
 
-import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.UserPositionServiceGrpc
 import gedorinku.tsugidoko_server.UserPositions
 import io.github.hunachi.tsugidoko.util.NetworkState
 import io.grpc.stub.MetadataUtils
 import kotlinx.coroutines.coroutineScope
 
-class UserPositionServiceClient(preferences: SharedPreferences) : ServiceClient(preferences) {
+class UserPositionServiceClient : ServiceClient() {
 
     private var userPositionStub = UserPositionServiceGrpc.newBlockingStub(channel)
 
-    init {
-        userPositionStub = MetadataUtils.attachHeaders(userPositionStub, setKeyMetadata())
+    override fun setUp(sessionId: String) {
+        userPositionStub = MetadataUtils.attachHeaders(userPositionStub, setKeyMetadata(sessionId))
     }
 
     suspend fun userPosition() = coroutineScope {

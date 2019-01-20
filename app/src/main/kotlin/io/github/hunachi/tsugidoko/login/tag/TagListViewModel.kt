@@ -1,5 +1,6 @@
 package io.github.hunachi.tsugidoko.login.tag
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,18 +11,20 @@ import io.github.hunachi.tsugidoko.infra.UserServiceClient
 import io.github.hunachi.tsugidoko.model.Tag
 import io.github.hunachi.tsugidoko.model.convertTag
 import io.github.hunachi.tsugidoko.util.NetworkState
+import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
 import java.lang.Exception
 
 class TagListViewModel(
         private val tagServiceClient: TagServiceClient,
-        private val userClient: UserServiceClient
+        private val userClient: UserServiceClient,
+        preferences: SharedPreferences
 ) : ViewModel() {
 
     private val _tagListState = MutableLiveData<List<Tag>>()
     val tagListState: LiveData<List<Tag>> = _tagListState
 
-    private val _updateTagsState =  MutableLiveData<List<Tag>>()
+    private val _updateTagsState = MutableLiveData<List<Tag>>()
     val updateTagState: LiveData<List<Tag>> = _updateTagsState
 
     private val _tagListErrorState = MutableLiveData<Exception>()
@@ -35,6 +38,13 @@ class TagListViewModel(
 
     private val _userErrorState = MutableLiveData<Exception>()
     val userErrorState: LiveData<Exception> = _userErrorState
+
+    init {
+        preferences.session()?.let {
+            tagServiceClient.setUp(it)
+            userClient.setUp(it)
+        }
+    }
 
     fun tagList() {
         viewModelScope.launch {

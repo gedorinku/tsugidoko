@@ -1,18 +1,17 @@
 package io.github.hunachi.tsugidoko.infra
 
-import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.UserServiceGrpc
 import gedorinku.tsugidoko_server.Users
 import io.github.hunachi.tsugidoko.util.NetworkState
 import io.grpc.stub.MetadataUtils
 import kotlinx.coroutines.coroutineScope
 
-class UserServiceClient(preferences: SharedPreferences) : ServiceClient(preferences) {
+class UserServiceClient : ServiceClient() {
 
     private var userStub = UserServiceGrpc.newBlockingStub(channel)
 
-    init {
-        userStub = MetadataUtils.attachHeaders(userStub, setKeyMetadata())
+    override fun setUp(sessionId: String) {
+        userStub = MetadataUtils.attachHeaders(userStub, setKeyMetadata(sessionId))
     }
 
     suspend fun user() = coroutineScope {

@@ -1,5 +1,6 @@
 package io.github.hunachi.tsugidoko
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,11 +10,13 @@ import gedorinku.tsugidoko_server.Users
 import io.github.hunachi.tsugidoko.infra.UserPositionServiceClient
 import io.github.hunachi.tsugidoko.infra.UserServiceClient
 import io.github.hunachi.tsugidoko.util.NetworkState
+import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
 
 class MainViewModel(
         private val userPositionClient: UserPositionServiceClient,
-        private val userClient: UserServiceClient
+        private val userClient: UserServiceClient,
+        preferences: SharedPreferences
 ) : ViewModel() {
 
     private val _sendState = MutableLiveData<Nothing>()
@@ -33,6 +36,13 @@ class MainViewModel(
 
     private val _userErrorState = MutableLiveData<Exception>()
     val userErrorState: LiveData<Exception> = _userErrorState
+
+    init {
+        preferences.session()?.let {
+            userPositionClient.setUp(it)
+            userClient.setUp(it)
+        }
+    }
 
     fun preSendState() {
         viewModelScope.launch {

@@ -1,19 +1,18 @@
 package io.github.hunachi.tsugidoko.infra
 
-import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.SessionServiceGrpc
 import gedorinku.tsugidoko_server.Sessions
-import gedorinku.tsugidoko_server.Users
 import io.github.hunachi.tsugidoko.util.NetworkState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
 class SessionServiceClient(
-        private val userServiceClient: UserServiceClient,
-        preferences: SharedPreferences
-) : ServiceClient(preferences) {
+        private val userServiceClient: UserServiceClient
+) : ServiceClient() {
 
     private val sessionStub = SessionServiceGrpc.newBlockingStub(channel)
+
+    override fun setUp(sessionId: String) {}
 
     suspend fun createSession(userName: String, password: String) = coroutineScope {
         try {

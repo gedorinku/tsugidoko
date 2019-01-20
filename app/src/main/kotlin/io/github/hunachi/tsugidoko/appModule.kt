@@ -12,27 +12,27 @@ import org.koin.dsl.module.module
 
 val appModule = module {
 
-    factory { UserPositionServiceClient(get()) }
+    factory { UserPositionServiceClient() }
 
     factory { setupSharedPreference(get()) }
 
-    factory { SessionServiceClient(get(), get()) }
+    factory { SessionServiceClient(get()) }
 
-    factory { UserServiceClient(get()) }
+    factory { UserServiceClient() }
 
-    factory { ClassRoomServiceClient(get()) }
+    factory { ClassRoomServiceClient() }
 
-    factory { TagServiceClient(get()) }
+    factory { TagServiceClient() }
 
     factory { MapViewModel(get()) }
 
     viewModel { LoginViewModel(get(), get()) }
 
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get()) }
 
     viewModel { RegisterViewModel(get(), get()) }
 
-    viewModel { TagListViewModel(get(), get()) }
+    viewModel { TagListViewModel(get(), get(), get()) }
 
-    viewModel { CreateTagViewModel(get()) }
+    viewModel { CreateTagViewModel(get(), get()) }
 }
