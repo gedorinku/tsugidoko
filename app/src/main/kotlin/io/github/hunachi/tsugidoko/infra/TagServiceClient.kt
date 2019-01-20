@@ -1,6 +1,5 @@
 package io.github.hunachi.tsugidoko.infra
 
-import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.TagServiceGrpc
 import gedorinku.tsugidoko_server.Tags
 import gedorinku.tsugidoko_server.UserTagServiceGrpc
@@ -10,14 +9,14 @@ import io.github.hunachi.tsugidoko.util.NetworkState
 import io.grpc.stub.MetadataUtils
 import kotlinx.coroutines.coroutineScope
 
-class TagServiceClient(preferences: SharedPreferences) : ServiceClient(preferences) {
+class TagServiceClient : ServiceClient() {
 
     private var tagStub = TagServiceGrpc.newBlockingStub(channel)
     private var userTagStub = UserTagServiceGrpc.newBlockingStub(channel)
 
-    init {
-        tagStub = MetadataUtils.attachHeaders(tagStub, setKeyMetadata())
-        userTagStub = MetadataUtils.attachHeaders(userTagStub, setKeyMetadata())
+    override fun setUp(sessionId: String) {
+        tagStub = MetadataUtils.attachHeaders(tagStub, setKeyMetadata(sessionId))
+        userTagStub = MetadataUtils.attachHeaders(userTagStub, setKeyMetadata(sessionId))
     }
 
     suspend fun tags() = coroutineScope {

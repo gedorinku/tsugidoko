@@ -1,6 +1,5 @@
 package io.github.hunachi.tsugidoko.infra
 
-import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.ClassRoomServiceGrpc
 import gedorinku.tsugidoko_server.ClassRooms
 import gedorinku.tsugidoko_server.Tags
@@ -8,14 +7,13 @@ import io.github.hunachi.tsugidoko.util.NetworkState
 import io.grpc.stub.MetadataUtils
 import kotlinx.coroutines.coroutineScope
 
-class ClassRoomServiceClient(preferences: SharedPreferences) : ServiceClient(preferences) {
+class ClassRoomServiceClient : ServiceClient() {
 
     private var classRoomStub = ClassRoomServiceGrpc.newBlockingStub(channel)
 
-    init {
-        classRoomStub = MetadataUtils.attachHeaders(classRoomStub, setKeyMetadata())
+    override fun setUp(sessionId: String) {
+        classRoomStub = MetadataUtils.attachHeaders(classRoomStub, setKeyMetadata(sessionId))
     }
-
 
     suspend fun classRooms(tags: List<Tags.Tag>) = coroutineScope {
         try {

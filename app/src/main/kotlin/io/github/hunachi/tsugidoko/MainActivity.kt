@@ -30,9 +30,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        if (preference.session()?.isNotBlank() != true) LoginActivity.start(this)
-
-        setUpMap()
+        if (preference.session()?.isNotBlank() != true) {
+            LoginActivity.start(this)
+        } else {
+            setUpMap()
+        }
     }
 
     override fun onRestart() {
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             sentState.nonNullObserve(this@MainActivity) {
-                mapFragment.addMyPositionMarker(it)
+                mapFragment.addMarker(it)
                 preSendState()
             }
 
