@@ -1,23 +1,31 @@
 package io.github.hunachi.tsugidoko.infra
 
+import android.content.SharedPreferences
 import gedorinku.tsugidoko_server.ClassRoomServiceGrpc
 import gedorinku.tsugidoko_server.ClassRooms
-import gedorinku.tsugidoko_server.type.TagOuterClass
+import gedorinku.tsugidoko_server.Tags
+import io.github.hunachi.tsugidoko.util.NetworkState
 import io.grpc.stub.MetadataUtils
 import kotlinx.coroutines.coroutineScope
 
-class ClassRoomServiceClient : ServiceClient() {
+class ClassRoomServiceClient(preferences: SharedPreferences) : ServiceClient(preferences) {
 
     private var classRoomStub = ClassRoomServiceGrpc.newBlockingStub(channel)
 
-    suspend fun classRooms(sessionId: String, tags: List<TagOuterClass.Tag>) = coroutineScope {
+    init {
+        classRoomStub = MetadataUtils.attachHeaders(classRoomStub, setKeyMetadata())
+    }
 
-        classRoomStub = MetadataUtils.attachHeaders(classRoomStub, setKeyMetadata(sessionId))
 
-        val createRequest = ClassRooms.ListClassRoomsRequest.newBuilder()
-                .apply { if(tags.isNotEmpty()) addAllTagIds(tags.map { it.id }) }
-                .build()
+    suspend fun classRooms(tags: List<Tags.Tag>) = coroutineScope {
+        try {
+            val createRequest = ClassRooms.ListClassRoomsRequest.newBuilder()
+                    .apply { if (tags.isNotEmpty()) addAllTagIds(tags.map { it.id }) }
+                    .build()
 
-        classRoomStub.listClassRooms(createRequest).classRoomsList
+            NetworkState.Success(classRoomStub.listClassRooms(createRequest).classRoomsList)
+        } catch (e: Exception) {
+            NetworkState.Error<List<ClassRooms.ClassRoom>>(e)
+        }
     }
 }

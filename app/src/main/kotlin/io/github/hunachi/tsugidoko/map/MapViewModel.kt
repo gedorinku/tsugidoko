@@ -1,60 +1,41 @@
 package io.github.hunachi.tsugidoko.map
 
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import gedorinku.tsugidoko_server.ClassRooms
+import gedorinku.tsugidoko_server.Tags
 import gedorinku.tsugidoko_server.Users
-import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.infra.ClassRoomServiceClient
 import io.github.hunachi.tsugidoko.infra.UserServiceClient
 import io.github.hunachi.tsugidoko.util.NetworkState
-import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
-import java.lang.Exception
 
 class MapViewModel(
-        private val classRoomsClient: ClassRoomServiceClient,
-        private val userClient: UserServiceClient,
-        private val preference: SharedPreferences
+        private val classRoomsClient: ClassRoomServiceClient
 ) : ViewModel() {
 
-    private val _userState = MutableLiveData<NetworkState<Users.User>>()
-    val userState: LiveData<NetworkState<Users.User>> = _userState
+    private val _classRoomState = MutableLiveData<List<ClassRooms.ClassRoom>>()
+    val classRoomState: LiveData<List<ClassRooms.ClassRoom>> = _classRoomState
 
-    private val _classRoomState = MutableLiveData<NetworkState<List<ClassRooms.ClassRoom>>>()
-    val classRoomState: LiveData<NetworkState<List<ClassRooms.ClassRoom>>> = _classRoomState
+    private val _classRoomErrorState = MutableLiveData<Exception>()
+    val classRoomErrorState: LiveData<Exception> = _classRoomErrorState
 
-    fun user() {
+    fun classRoom(tags: List<Tags.Tag>) {
         viewModelScope.launch {
             try {
-                preference.session()?.let { it ->
+                val classRoom = async { classRoomsClient.classRooms(tags) }
 
-                    val user = async { userClient.user(it) }
-
-                    _userState.postValue(NetworkState.Success(user.await()))
+                classRoom.await().let {
+                    when (it) {
+                        is NetworkState.Success -> _classRoomState.postValue(it.result)
+                        is NetworkState.Error -> _classRoomErrorState.postValue(it.e)
+                    }
                 }
-            } catch (e: Exception) {
+            } catch (e: java.lang.Exception) {
                 e.printStackTrace()
-                _userState.postValue(NetworkState.Error(e))
-            }
-        }
-    }
-
-    fun classRoom(tags: List<TagOuterClass.Tag>) {
-        viewModelScope.launch {
-            try {
-                preference.session()?.let { it ->
-
-                    val classRoom = async { classRoomsClient.classRooms(it, tags) }
-
-                    _classRoomState.postValue(NetworkState.Success(classRoom.await()))
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _classRoomState.postValue(NetworkState.Error(e))
+                _classRoomErrorState.postValue(e)
             }
         }
     }
