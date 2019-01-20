@@ -15,7 +15,7 @@ val appModule = module {
 
     factory { setupSharedPreference(get()) }
 
-    factory { SessionServiceClient(get(),get()) }
+    factory { SessionServiceClient(get(), get()) }
 
     factory { UserServiceClient(get()) }
 
@@ -23,11 +23,11 @@ val appModule = module {
 
     factory { TagServiceClient(get()) }
 
-    viewModel { MapViewModel(get(), get()) }
+    viewModel { MapViewModel(get()) }
 
     viewModel { LoginViewModel(get(), get()) }
 
-    viewModel { MainViewModel(get()) }
+    viewModel { MainViewModel(get(), get()) }
 
     viewModel { RegisterViewModel(get(), get()) }
 

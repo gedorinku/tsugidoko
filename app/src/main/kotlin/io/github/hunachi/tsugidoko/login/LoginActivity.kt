@@ -26,7 +26,13 @@ class LoginActivity : AppCompatActivity() {
         supportFragmentManager.inTransaction { replace(R.id.container, fragment) }
     }
 
-    fun finishSetup() = MainActivity.start(this)
+    fun finishSetup() {
+        if (intent.getBooleanExtra(EXT_TO_SELECT_TAG, false)) {
+            finish()
+        } else {
+            MainActivity.start(this)
+        }
+    }
 
     companion object {
         private const val EXT_TO_SELECT_TAG = "to_select_tags"

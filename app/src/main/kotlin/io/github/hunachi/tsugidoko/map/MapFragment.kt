@@ -17,9 +17,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import gedorinku.tsugidoko_server.ClassRooms
-import gedorinku.tsugidoko_server.Users
+import gedorinku.tsugidoko_server.Tags
 import gedorinku.tsugidoko_server.type.BuildingOuterClass
-import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.MainActivity
 import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.detailMap.DetailMapFragment
@@ -34,23 +33,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var mMap: GoogleMap? = null
     private val mapViewModel: MapViewModel by viewModel()
-    private var user: Users.User? = null
     private lateinit var classRooms: List<ClassRooms.ClassRoom>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         with(mapViewModel) {
-            userState.nonNullObserve(this@MapFragment) {
-                user = it
-                (activity as MainActivity).changeTags(it.tagsList)
-                reloadMarker(it.tagsList)
-            }
-
-            userErrorState.nonNullObserve(this@MapFragment) {
-                activity?.toast("${it.message}")
-            }
-
             classRoomState.nonNullObserve(this@MapFragment) {
                 it.groupBy { result -> result.building }.forEach { result ->
                     this@MapFragment.classRooms = result.value
@@ -114,11 +102,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     fun ClassRooms.ClassRoom.imageUrl() = "https://gedorinku.github.io/tsugidoko-pic/${building.id}/$floor.png"
 
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        mapViewModel.user()
-    }
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -145,11 +128,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun reloadMarker(tags: List<TagOuterClass.Tag>) {
+    fun reloadMarker(tags: List<Tags.Tag>) {
         mMap?.clear()
-        if (activity == null) {
-            Log.d("hoge", "nullnullhogehoge")
-        } else mapViewModel.classRoom(tags)
+        mapViewModel.classRoom(tags)
     }
 
     fun addMarker(classRoom: ClassRooms.ClassRoom) {

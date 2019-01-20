@@ -19,10 +19,13 @@ class TagListAdapter : ListAdapter<Tag, TagListAdapter.ViewHolder>(DIFF_UTIL) {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         holder.itemView.apply {
-            checkBox.isChecked = item.isSelected
+            checkBox.apply {
+                isChecked = item.isSelected
+                text = item.name
+            }
             setOnClickListener {
                 item.isSelected = item.isSelected.not()
-                checkBox.isChecked = item.isSelected
+                //checkBox.isChecked = item.isSelected
             }
         }
     }

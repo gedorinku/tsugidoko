@@ -5,11 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.infra.TagServiceClient
 import io.github.hunachi.tsugidoko.model.Tag
+import io.github.hunachi.tsugidoko.model.convertTag
 import io.github.hunachi.tsugidoko.util.NetworkState
-import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
 import java.lang.Exception
 
@@ -18,19 +17,35 @@ class TagListViewModel(
         private val preference: SharedPreferences
 ) : ViewModel() {
 
-    private val _tagListStatus = MutableLiveData<NetworkState<List<Tag>>>()
-    val tagListStatus: LiveData<NetworkState<List<Tag>>> = _tagListStatus
+    private val _tagListState = MutableLiveData<List<Tag>>()
+    val tagListState: LiveData<List<Tag>> = _tagListState
 
-    private val _addTagsState = MutableLiveData<NetworkState<Boolean>>()
-    val addTagState: LiveData<NetworkState<Boolean>> = _addTagsState
+    private val _addTagsState =  MutableLiveData<List<Tag>>()
+    val addTagState: LiveData<List<Tag>> = _addTagsState
+
+    private val _tagListErrorState = MutableLiveData<Exception>()
+    val tagListErrorState: LiveData<Exception> = _tagListErrorState
+
+    private val _addTagsErrorState = MutableLiveData<Exception>()
+    val addTagsErrorState: LiveData<Exception> = _addTagsErrorState
 
     fun tagList() {
         viewModelScope.launch {
             try {
-                val tagList = async { }
-                // todo
+                val tagList = async { tagServiceClient.tags() }
+
+                tagList.await().let {
+                    when (it) {
+                        is NetworkState.Success -> {
+                            _tagListState.postValue(it.result.tagsList.map { i -> i.convertTag() })
+                        }
+                        is NetworkState.Error -> {
+                            _tagListErrorState.postValue(it.e)
+                        }
+                    }
+                }
             } catch (e: Exception) {
-                _tagListStatus.postValue(NetworkState.Error(e))
+                _tagListErrorState.postValue(e)
                 e.printStackTrace()
             }
         }
@@ -39,10 +54,20 @@ class TagListViewModel(
     fun addTags(tags: List<Tag>) {
         viewModelScope.launch {
             try {
-                tags.map { it.convert() }
-                // todo
+                val tags = async { tagServiceClient.attachTags(tags) }
+
+                tags.await().let {
+                    when (it) {
+                        is NetworkState.Success -> {
+                            _addTagsState.postValue(it.result.tagsList.map { i -> i.convertTag() })
+                        }
+                        is NetworkState.Error -> {
+                            _addTagsErrorState.postValue(it.e)
+                        }
+                    }
+                }
             } catch (e: Exception) {
-                _addTagsState.postValue(NetworkState.Error(e))
+                _addTagsErrorState.postValue(e)
                 e.printStackTrace()
             }
         }

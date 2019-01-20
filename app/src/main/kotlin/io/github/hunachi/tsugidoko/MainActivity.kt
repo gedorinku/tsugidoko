@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
-import gedorinku.tsugidoko_server.type.TagOuterClass
 import io.github.hunachi.tsugidoko.login.LoginActivity
 import io.github.hunachi.tsugidoko.map.MapFragment
 import org.koin.android.ext.android.inject
@@ -16,6 +15,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import android.net.wifi.WifiManager
 import io.github.hunachi.tsugidoko.util.*
 import android.net.ConnectivityManager
+import gedorinku.tsugidoko_server.Tags
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val preference: SharedPreferences by inject()
     private val mainViewModel: MainViewModel by viewModel()
     private val mapFragment = MapFragment.newInstance()
-    private val selectedTags: MutableList<TagOuterClass.Tag> = mutableListOf()
+    private val selectedTags: MutableList<Tags.Tag> = mutableListOf()
     private var mMenu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +33,11 @@ class MainActivity : AppCompatActivity() {
         if (preference.session()?.isNotBlank() != true) LoginActivity.start(this)
 
         setUpMap()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        mainViewModel.user()
     }
 
     private fun isWifiConnected() =
@@ -73,10 +78,22 @@ class MainActivity : AppCompatActivity() {
                 toast("error ${it.message}")
                 preSendState()
             }
-        }.preSendState()
+
+            userState.nonNullObserve(this@MainActivity) {
+                changeTags(it.tagsList)
+                mapFragment.reloadMarker(it.tagsList)
+            }
+
+            userErrorState.nonNullObserve(this@MainActivity) {
+                toast("${it.message}")
+            }
+        }.run {
+            user()
+            preSendState()
+        }
     }
 
-    fun changeTags(tags: List<TagOuterClass.Tag>) {
+    private fun changeTags(tags: List<Tags.Tag>) {
         selectedTags.apply {
             clear()
             addAll(tags)

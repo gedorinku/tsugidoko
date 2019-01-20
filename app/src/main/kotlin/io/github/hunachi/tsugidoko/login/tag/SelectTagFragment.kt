@@ -6,10 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.github.hunachi.tsugidoko.MainActivity
 import io.github.hunachi.tsugidoko.R
 import io.github.hunachi.tsugidoko.login.LoginActivity
 import io.github.hunachi.tsugidoko.model.Tag
+import io.github.hunachi.tsugidoko.util.nonNullObserve
+import io.github.hunachi.tsugidoko.util.toast
 import kotlinx.android.synthetic.main.fragment_tag_list.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -17,10 +18,28 @@ class SelectTagFragment : Fragment() {
 
     private val listAdapter = TagListAdapter()
     private val tagListViewModel: TagListViewModel by viewModel()
+    private lateinit var tags: List<Tag>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        listAdapter.submitList(listOf(Tag(0, "0"), Tag(1, "1")))
+        tagListViewModel.apply {
+            tagListState.nonNullObserve(this@SelectTagFragment){
+                listAdapter.submitList(it)
+            }
+
+            tagListErrorState.nonNullObserve(this@SelectTagFragment){
+                activity?.toast("${it.message}")
+            }
+
+            addTagState.nonNullObserve(this@SelectTagFragment){
+                activity?.toast("success !!")
+                (activity as LoginActivity).finishSetup()
+            }
+
+            addTagsErrorState.nonNullObserve(this@SelectTagFragment){
+                activity?.toast("${it.message}")
+            }
+        }.tagList()
     }
 
     override fun onCreateView(
@@ -34,17 +53,11 @@ class SelectTagFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
         button.setOnClickListener {
-            when(activity){
-                is LoginActivity -> (activity as LoginActivity).finishSetup()
-                is MainActivity -> {}
-            }
+            (activity as LoginActivity).finishSetup()
         }
     }
 
     companion object {
-
-        const val ARG_COLUMN_COUNT = "column-count"
-
         fun newInstance() = SelectTagFragment()
     }
 }
