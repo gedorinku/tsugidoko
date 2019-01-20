@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if(supportFragmentManager.fragments.find { it is MapFragment } == null) {
+        if (supportFragmentManager.fragments.find { it is MapFragment } == null) {
             changeFragment(mapFragment)
         }
     }
@@ -125,6 +125,7 @@ class MainActivity : AppCompatActivity() {
 
     fun changeFragment(fragment: Fragment) {
         supportFragmentManager.inTransaction { replace(R.id.container, fragment) }
+        if (fragment is MapFragment) mainViewModel.user()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

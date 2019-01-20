@@ -2,7 +2,6 @@ package io.github.hunachi.tsugidoko.map
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import gedorinku.tsugidoko_server.ClassRooms
 import gedorinku.tsugidoko_server.Tags
 import gedorinku.tsugidoko_server.type.BuildingOuterClass
@@ -26,18 +22,50 @@ import io.github.hunachi.tsugidoko.model.Building
 import io.github.hunachi.tsugidoko.model.FloorRooms
 import io.github.hunachi.tsugidoko.util.nonNullObserve
 import io.github.hunachi.tsugidoko.util.toast
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.android.ext.android.inject
 
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var mMap: GoogleMap? = null
-    private val mapViewModel: MapViewModel by viewModel()
+    private val mapViewModel: MapViewModel by inject()
     private lateinit var classRooms: List<ClassRooms.ClassRoom>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        with(mapViewModel) {
+            classRoomState.nonNullObserve(this@MapFragment) {
+                it.groupBy { result -> result.building }.forEach { result ->
+                    this@MapFragment.classRooms = result.value
+                    showMapsMarkers(result.key, result.value)
+                }
+            }
+
+            classRoomErrorState.nonNullObserve(this@MapFragment) {
+                activity?.toast("${it.message}")
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        with(mapViewModel) {
+            classRoomState.nonNullObserve(this@MapFragment) {
+                it.groupBy { result -> result.building }.forEach { result ->
+                    this@MapFragment.classRooms = result.value
+                    showMapsMarkers(result.key, result.value)
+                }
+            }
+
+            classRoomErrorState.nonNullObserve(this@MapFragment) {
+                activity?.toast("${it.message}")
+            }
+        }
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
         with(mapViewModel) {
             classRoomState.nonNullObserve(this@MapFragment) {
                 it.groupBy { result -> result.building }.forEach { result ->
@@ -58,17 +86,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     ) {
         if (mMap != null) {
             /*以下のif文を消すと0人の時にも表示される*/
-            val peopleCountMessage = when (classRooms.sumBy { it.tagCountsCount }) {
-                in 0..4 -> "数人"
-                in 5..10 -> "5人以上"
-                in 10..20 -> "10人以上"
-                in 20..50 -> "20人以上"
-                else -> "50人以上"
+            val markerIcon = when (classRooms.sumBy { it.tagCountsCount }) {
+                in 0..4 -> R.drawable.arrow_blue
+                in 5..10 -> R.drawable.arrow_yellow
+                in 10..20 -> R.drawable.arrow_red
+                else -> R.drawable.arrow_red
             }
 
             mMap?.addMarker(MarkerOptions()
                     .position(LatLng(building.latitude, building.longitude))
-                    .title("${building.name}(${peopleCountMessage}人以上)"))
+                    .icon(BitmapDescriptorFactory.fromResource(markerIcon)))
                     ?.apply { tag = Pair(building, classRooms) }
 
             mMap?.setOnMarkerClickListener { it ->

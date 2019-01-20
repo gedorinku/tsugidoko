@@ -24,7 +24,7 @@ val appModule = module {
 
     factory { TagServiceClient(get()) }
 
-    viewModel { MapViewModel(get()) }
+    factory { MapViewModel(get()) }
 
     viewModel { LoginViewModel(get(), get()) }
 
