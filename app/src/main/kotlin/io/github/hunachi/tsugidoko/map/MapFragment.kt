@@ -31,8 +31,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val mapViewModel: MapViewModel by inject()
     private lateinit var classRooms: List<ClassRooms.ClassRoom>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         with(mapViewModel) {
             classRoomState.nonNullObserve(this@MapFragment) {
                 it.groupBy { result -> result.building }.forEach { result ->
