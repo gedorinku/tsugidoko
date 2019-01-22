@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import io.github.hunachi.tsugidoko.infra.TagServiceClient
 import io.github.hunachi.tsugidoko.model.Tag
 import io.github.hunachi.tsugidoko.model.convertTag
+import io.github.hunachi.tsugidoko.util.LoadingLiveData
+import io.github.hunachi.tsugidoko.util.LoadingMutableLiveData
 import io.github.hunachi.tsugidoko.util.NetworkState
 import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
@@ -24,6 +26,9 @@ class CreateTagViewModel(
     private val _createTagErrorState = MutableLiveData<Exception>()
     val createTagErrorState: LiveData<Exception> = _createTagErrorState
 
+    private val _loadingState = LoadingMutableLiveData()
+    val loadingState: LoadingLiveData = _loadingState
+
     init {
         preferences.session()?.let {
             tagServiceClient.setUp(it)
@@ -33,6 +38,7 @@ class CreateTagViewModel(
     fun createTag(tag: Tag) {
         viewModelScope.launch {
             try {
+                _loadingState.loading()
                 val result = async { tagServiceClient.createTag(tag) }
 
                 result.await().let {
@@ -45,10 +51,12 @@ class CreateTagViewModel(
                             _createTagErrorState.postValue(it.e)
                         }
                     }
+                    _loadingState.stop()
                 }
             } catch (e: Exception) {
                 _createTagErrorState.postValue(e)
                 e.printStackTrace()
+                _loadingState.stop()
             }
         }
     }

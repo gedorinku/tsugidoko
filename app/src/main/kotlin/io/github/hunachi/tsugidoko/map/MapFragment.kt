@@ -33,7 +33,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         with(mapViewModel) {
             classRoomState.nonNullObserve(this@MapFragment) {
                 it.groupBy { result -> result.building }.forEach { result ->
@@ -45,39 +44,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             classRoomErrorState.nonNullObserve(this@MapFragment) {
                 activity?.toast("${it.message}")
             }
-        }
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        with(mapViewModel) {
-            classRoomState.nonNullObserve(this@MapFragment) {
-                it.groupBy { result -> result.building }.forEach { result ->
-                    this@MapFragment.classRooms = result.value
-                    showMapsMarkers(result.key, result.value)
-                }
-            }
-
-            classRoomErrorState.nonNullObserve(this@MapFragment) {
-                activity?.toast("${it.message}")
+            loadingState.nonNullObserve(this@MapFragment) {
+                (activity as? MainActivity)?.loadingReloadMenuIcon(it)
             }
         }
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        with(mapViewModel) {
-            classRoomState.nonNullObserve(this@MapFragment) {
-                it.groupBy { result -> result.building }.forEach { result ->
-                    this@MapFragment.classRooms = result.value
-                    showMapsMarkers(result.key, result.value)
-                }
-            }
-
-            classRoomErrorState.nonNullObserve(this@MapFragment) {
-                activity?.toast("${it.message}")
-            }
-        }
+        (context as? MainActivity)?.let { it.reloadMarker() }
     }
 
     private fun showMapsMarkers(
@@ -103,7 +79,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     Building(
                             building.id,
                             building.name,
-                            classRooms.convertFloors()
+                            ((it.tag as Pair<*, *>).second as List<ClassRooms.ClassRoom>).convertFloors()
                     ).let {
                         (activity as MainActivity).changeFragment(DetailMapFragment.newInstance(it))
                     }

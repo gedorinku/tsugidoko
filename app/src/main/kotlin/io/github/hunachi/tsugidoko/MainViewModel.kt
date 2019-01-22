@@ -9,6 +9,8 @@ import gedorinku.tsugidoko_server.ClassRooms
 import gedorinku.tsugidoko_server.Users
 import io.github.hunachi.tsugidoko.infra.UserPositionServiceClient
 import io.github.hunachi.tsugidoko.infra.UserServiceClient
+import io.github.hunachi.tsugidoko.util.LoadingLiveData
+import io.github.hunachi.tsugidoko.util.LoadingMutableLiveData
 import io.github.hunachi.tsugidoko.util.NetworkState
 import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
@@ -37,6 +39,9 @@ class MainViewModel(
     private val _userErrorState = MutableLiveData<Exception>()
     val userErrorState: LiveData<Exception> = _userErrorState
 
+    private val _loadingState = LoadingMutableLiveData()
+    val loadingState: LoadingLiveData = _loadingState
+
     init {
         preferences.session()?.let {
             userPositionClient.setUp(it)
@@ -47,7 +52,7 @@ class MainViewModel(
     fun preSendState() {
         viewModelScope.launch {
             try {
-                delay(5000)
+                delay(10000)
                 _sendState.postValue(null)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -79,6 +84,7 @@ class MainViewModel(
     fun user() {
         viewModelScope.launch {
             try {
+                _loadingState.loading()
                 val user = async { userClient.user() }
 
                 user.await().let {
@@ -86,10 +92,12 @@ class MainViewModel(
                         is NetworkState.Success -> _userState.postValue(it.result)
                         is NetworkState.Error -> _userErrorState.postValue(it.e)
                     }
+                    _loadingState.stop()
                 }
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
                 _userErrorState.postValue(e)
+                _loadingState.stop()
             }
         }
     }

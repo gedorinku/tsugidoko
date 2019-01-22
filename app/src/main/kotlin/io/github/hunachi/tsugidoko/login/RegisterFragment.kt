@@ -48,6 +48,10 @@ class RegisterFragment : Fragment() {
             sessionIdErrorState.nonNullObserve(this@RegisterFragment) {
                 activity?.toast("${it.message}")
             }
+
+            loadingState.nonNullObserve(this@RegisterFragment){
+                spin_kit.visibility = if(it) View.VISIBLE else View.INVISIBLE
+            }
         }
     }
 

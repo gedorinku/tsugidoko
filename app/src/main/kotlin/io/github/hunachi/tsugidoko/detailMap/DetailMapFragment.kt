@@ -20,16 +20,12 @@ class DetailMapFragment : Fragment(), ViewPager.OnPageChangeListener {
         arguments?.getSerializable(ARG_BUILDING_ID) as Building
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         return container!!.inflate(R.layout.fragment_detail_map).apply {
-            viewpager.adapter = DetailMapPagerAdapter(childFragmentManager, detailMap.rooms)
+            viewpager.adapter = DetailMapPagerAdapter(childFragmentManager, detailMap.rooms.sortedBy { it.floor })
             viewpagertab.setViewPager(viewpager)
         }
     }

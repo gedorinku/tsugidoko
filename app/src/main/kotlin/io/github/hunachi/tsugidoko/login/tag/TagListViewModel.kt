@@ -10,6 +10,8 @@ import io.github.hunachi.tsugidoko.infra.TagServiceClient
 import io.github.hunachi.tsugidoko.infra.UserServiceClient
 import io.github.hunachi.tsugidoko.model.Tag
 import io.github.hunachi.tsugidoko.model.convertTag
+import io.github.hunachi.tsugidoko.util.LoadingLiveData
+import io.github.hunachi.tsugidoko.util.LoadingMutableLiveData
 import io.github.hunachi.tsugidoko.util.NetworkState
 import io.github.hunachi.tsugidoko.util.session
 import kotlinx.coroutines.*
@@ -39,6 +41,9 @@ class TagListViewModel(
     private val _userErrorState = MutableLiveData<Exception>()
     val userErrorState: LiveData<Exception> = _userErrorState
 
+    private val _loadingState = LoadingMutableLiveData()
+    val loadingState: LoadingLiveData = _loadingState
+
     init {
         preferences.session()?.let {
             tagServiceClient.setUp(it)
@@ -48,6 +53,7 @@ class TagListViewModel(
 
     fun tagList() {
         viewModelScope.launch {
+            _loadingState.loading()
             try {
                 val tagList = async { tagServiceClient.tags() }
 
@@ -60,6 +66,7 @@ class TagListViewModel(
                             _tagListErrorState.postValue(it.e)
                         }
                     }
+                    _loadingState.stop()
                 }
             } catch (e: Exception) {
                 _tagListErrorState.postValue(e)
@@ -71,6 +78,7 @@ class TagListViewModel(
     fun updateTags(tags: List<Tag>) {
         viewModelScope.launch {
             try {
+                _loadingState.loading()
                 val result = async { tagServiceClient.updateTags(tags) }
 
                 result.await().let {
@@ -83,10 +91,12 @@ class TagListViewModel(
                             _updateTagsErrorState.postValue(it.e)
                         }
                     }
+                    _loadingState.stop()
                 }
             } catch (e: Exception) {
                 _updateTagsErrorState.postValue(e)
                 e.printStackTrace()
+                _loadingState.stop()
             }
         }
     }
@@ -94,6 +104,7 @@ class TagListViewModel(
     fun user() {
         viewModelScope.launch {
             try {
+                _loadingState.loading()
                 val user = async { userClient.user() }
 
                 user.await().let {
@@ -104,10 +115,12 @@ class TagListViewModel(
                             _userErrorState.postValue(it.e)
                         }
                     }
+                    _loadingState.stop()
                 }
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
                 _userErrorState.postValue(e)
+                _loadingState.stop()
             }
         }
     }
