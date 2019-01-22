@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         if (preference.session()?.isNotBlank() != true) {
             LoginActivity.start(this)
+            finish()
         } else {
             setUpMap()
         }
