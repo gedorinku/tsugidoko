@@ -1,6 +1,5 @@
 package io.github.hunachi.tsugidoko.detailMap
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,22 +19,14 @@ class DetailMapFragment : Fragment(), ViewPager.OnPageChangeListener {
         arguments?.getSerializable(ARG_BUILDING_ID) as Building
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         return container!!.inflate(R.layout.fragment_detail_map).apply {
-            viewpager.adapter = DetailMapPagerAdapter(childFragmentManager, detailMap.rooms)
+            viewpager.adapter = DetailMapPagerAdapter(childFragmentManager, detailMap.rooms.sortedBy { it.floor })
             viewpagertab.setViewPager(viewpager)
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
     }
 
     override fun onPageScrollStateChanged(state: Int) {}

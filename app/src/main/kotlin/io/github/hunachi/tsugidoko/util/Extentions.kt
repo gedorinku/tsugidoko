@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import io.github.hunachi.tsugidoko.R
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -19,15 +20,15 @@ fun <T> lazyFast(operation: () -> T) = lazy(LazyThreadSafetyMode.NONE) {
 }
 
 fun ViewGroup.inflate(
-    @LayoutRes layout: Int, attachToRoot: Boolean = false
+        @LayoutRes layout: Int, attachToRoot: Boolean = false
 ): View {
     return LayoutInflater.from(context).inflate(layout, this, attachToRoot)
 }
 
 inline fun FragmentManager.inTransaction(
-    func: FragmentTransaction.() -> FragmentTransaction
+        func: FragmentTransaction.() -> FragmentTransaction
 ) {
-    beginTransaction().func().commit()
+    beginTransaction().setCustomAnimations(R.animator.slide_up, R.animator.slide_down).func().commit()
 }
 
 fun AppCompatActivity.startActivity(next: AppCompatActivity) {
@@ -38,7 +39,7 @@ val <T> T.checkAllMatched: T
     get() = this
 
 fun <T> LiveData<T>.nonNullObserve(owner: LifecycleOwner, observer: (T) -> Unit) {
-    this.observe(owner, Observer { it?.let(observer) })
+    this.observe(owner, Observer { this.value?.let(observer) })
 }
 
 fun <T> LiveData<T>.observe(owner: LifecycleOwner, observer: (T?) -> Unit) {

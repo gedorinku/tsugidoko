@@ -1,49 +1,73 @@
 package io.github.hunachi.tsugidoko.login
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import io.github.hunachi.tsugidoko.MainActivity
 import io.github.hunachi.tsugidoko.R
-import io.github.hunachi.tsugidoko.util.NetworkState
-import io.github.hunachi.tsugidoko.util.nonNullObserve
-import io.github.hunachi.tsugidoko.util.toast
-import kotlinx.android.synthetic.main.activity_login.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import io.github.hunachi.tsugidoko.login.tag.SelectTagFragment
+import io.github.hunachi.tsugidoko.util.inTransaction
+
 
 class LoginActivity : AppCompatActivity() {
-
-    private var isRegister = false
-    private val loginViewModel: LoginViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        with(submitButton) {
-            setOnClickListener {
-                val userName = identicalText.text.toString()
-                val password = passwordText.text.toString()
-                if (userName.isNotBlank() && password.isNotBlank()) {
-                    loginViewModel.submit(userName, password, isRegister)
+        requestPermission()
+
+        /*MainActivityとかからTagを追加したいって時かどうか調べる．*/
+        if (intent.getBooleanExtra(EXT_TO_SELECT_TAG, false)) {
+            changeFragment(SelectTagFragment.newInstance())
+        } else changeFragment(RegisterFragment.newInstance())
+    }
+
+    fun changeFragment(fragment: Fragment) {
+        supportFragmentManager.inTransaction { replace(R.id.container, fragment) }
+    }
+
+    fun finishSetup() {
+        if (intent.getBooleanExtra(EXT_TO_SELECT_TAG, false)) {
+            finish()
+        } else {
+            MainActivity.start(this)
+        }
+    }
+
+    private val reqPermissions: MutableList<String> = mutableListOf()
+
+    private fun requestPermission() {
+        listOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+                .forEachIndexed { i, s ->
+                    if (ContextCompat.checkSelfPermission(this, s) != PackageManager.PERMISSION_GRANTED) {
+                        reqPermissions.add(s)
+                    }
                 }
-            }
-            text = "ログイン"
+        if (reqPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, reqPermissions.toTypedArray(), 0)
         }
-        with(changeLoginStateText) {
-            text = "新規登録をしていない方はこちら！"
-            setOnClickListener {
-                isRegister = !isRegister
-                submitButton.text = if (isRegister) "登録" else "ログイン"
-                text = if (isRegister) "登録済みの方はこちら！" else "新規登録をしていない方はこちら！"
-                identicalText
-            }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == 0) {
+            if (permissions.size != reqPermissions.size ||
+                    grantResults.any { it != PackageManager.PERMISSION_GRANTED }) requestPermission()
         }
-        loginViewModel.submitStatus.nonNullObserve(this) {
-            when (it) {
-                is NetworkState.Success -> finish()
-                is NetworkState.Error -> toast(it.e.message ?: "hogehoge")
-            }
-        }
+    }
+
+    companion object {
+        private const val EXT_TO_SELECT_TAG = "to_select_tags"
+
+        fun start(context: Context, toSelectTag: Boolean = false) =
+                context.startActivity(Intent(context, LoginActivity::class.java).apply {
+                    putExtra(EXT_TO_SELECT_TAG, toSelectTag)
+                })
     }
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import io.github.hunachi.tsugidoko.model.Tag
 
 
 private const val NAME_STORE = "Store"
@@ -16,3 +17,13 @@ fun setupSharedPreference(application: Application): SharedPreferences =
 fun SharedPreferences.session(): String? = getString(NAME_SESSION, null)
 
 fun SharedPreferences.session(token: String) = edit { putString(NAME_SESSION, token) }
+
+/*
+
+fun SharedPreferences.selectedTagsOnMap() = getString(NAME_OWNER_TAGS, null)
+
+fun SharedPreferences.selectedTagsOnMap(tags: List<Tag>) = edit {
+    tags.map { it.id }
+}
+
+*/

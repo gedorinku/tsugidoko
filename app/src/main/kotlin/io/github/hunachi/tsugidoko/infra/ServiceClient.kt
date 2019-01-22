@@ -1,6 +1,5 @@
 package io.github.hunachi.tsugidoko.infra
 
-
 import androidx.annotation.CheckResult
 import io.github.hunachi.tsugidoko.BuildConfig
 import io.grpc.ManagedChannel
@@ -13,6 +12,8 @@ abstract class ServiceClient {
             .forAddress(BuildConfig.SERVER_URL, BuildConfig.PORT.toInt())
             .useTransportSecurity()
             .build()
+
+    abstract fun setUp(sessionId: String)
 
     @CheckResult
     protected fun setKeyMetadata(sessionId: String) =
