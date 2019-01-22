@@ -21,9 +21,9 @@
 
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/spin_kit"
-        style="@style/SpinKitView.Large.CubeGrid"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        style="@style/SpinKitView.Large.WanderingCubes"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_gravity="center"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
