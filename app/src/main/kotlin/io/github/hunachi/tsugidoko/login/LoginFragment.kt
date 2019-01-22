@@ -47,9 +47,7 @@ class LoginFragment : Fragment() {
                 activity?.toast("${it.message}")
             }
 
-            loadingState.nonNullObserve(this@LoginFragment){
-                spin_kit.visibility = if(it) View.VISIBLE else View.INVISIBLE
-            }
+            loadingState.nonNullObserve(this@LoginFragment) {}
         }
     }
 
